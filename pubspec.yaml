@@ -41,6 +41,7 @@ dependencies:
   flutter_statusbarcolor: ^0.2.3
   connectivity: ^0.4.8+5
   provider: ^4.0.1
+  lottie: ^0.3.4
 
 dev_dependencies:
   flutter_test:
@@ -70,6 +71,7 @@ flutter:
   assets:
     - assets/icons/
     - assets/images/
+    - assets/noInternet.json
   #  - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

@@ -11,6 +11,7 @@ import 'package:covid_19/widgets/search.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:stacked/stacked.dart';
 import 'package:time_formatter/time_formatter.dart';
@@ -67,7 +68,12 @@ class _HomeViewState extends State<HomeView> {
               (connectionStatus == ConnectivityStatus.Offline ||
                       connectionStatus == null)
                   ? Center(
-                      child: Text("No Internet Connection"),
+                      child: Lottie.asset(
+                        'assets/noInternet.json',
+                        width: 300,
+                        height: 300,
+                        fit: BoxFit.fill,
+                      ),
                     )
                   : Column(children: <Widget>[
                       Container(
@@ -226,20 +232,20 @@ class _HomeViewState extends State<HomeView> {
                                                   children: <Widget>[
                                                     Counter(
                                                       color: kInfectedColor,
-                                                      number: snapshot
-                                                          .data['cases'],
+                                                      number: model
+                                                          .worldData['cases'],
                                                       title: "Infected",
                                                     ),
                                                     Counter(
                                                       color: kDeathColor,
-                                                      number: snapshot
-                                                          .data['deaths'],
+                                                      number: model
+                                                          .worldData['deaths'],
                                                       title: "Deaths",
                                                     ),
                                                     Counter(
                                                       color: kRecovercolor,
-                                                      number: snapshot
-                                                          .data['recovered'],
+                                                      number: model.worldData[
+                                                          'recovered'],
                                                       title: "Recovered",
                                                     ),
                                                   ],
@@ -252,9 +258,8 @@ class _HomeViewState extends State<HomeView> {
                                                             height: 20,
                                                           ),
                                                           MoreInfo(
-                                                            worldData:
-                                                                snapshot.data,
-                                                          ),
+                                                              worldData: model
+                                                                  .worldData),
                                                         ],
                                                       ),
                                               ],
