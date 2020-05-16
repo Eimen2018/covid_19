@@ -69,7 +69,7 @@ class _InfoViewState extends State<InfoView> {
                           SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
                                 SymptomCard(
                                   image: "assets/images/headache.png",

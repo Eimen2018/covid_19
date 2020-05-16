@@ -49,13 +49,8 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     var connectionStatus = Provider.of<ConnectivityStatus>(context);
     return ViewModelBuilder<HomeViewModel>.reactive(
-      onModelReady: (model) {
-        // if (connectionStatus == ConnectivityStatus.Wifi||connectionStatus == ConnectivityStatus.Cellular) {
-        model.fetchWorldData();
-        model.fetchMostAffected();
-        model.fetchAllcountries();
-        // }
-      },
+      // createNewModelOnInsert: true,
+      onModelReady: (model) {},
       viewModelBuilder: () => HomeViewModel(),
       builder: (context, model, child) => Scaffold(
         body: SingleChildScrollView(
@@ -69,7 +64,8 @@ class _HomeViewState extends State<HomeView> {
                 offset: offset,
                 page: "Home",
               ),
-              (connectionStatus == ConnectivityStatus.Offline)
+              (connectionStatus == ConnectivityStatus.Offline ||
+                      connectionStatus == null)
                   ? Center(
                       child: Text("No Internet Connection"),
                     )
@@ -95,8 +91,6 @@ class _HomeViewState extends State<HomeView> {
                             GestureDetector(
                               onTap: () {
                                 model.setcountry('Global');
-                                model.fetchWorldData();
-                                model.fetchMostAffected();
                               },
                               child: Image.asset(
                                 "assets/icons/globe.png",
@@ -111,26 +105,34 @@ class _HomeViewState extends State<HomeView> {
                                       ? Colors.black87
                                       : Colors.white),
                             ),
-                            IconButton(
-                                icon: Icon(
-                                  Icons.search,
-                                  color: Theme.of(context).brightness ==
-                                          Brightness.light
-                                      ? Colors.black87
-                                      : Colors.white54,
-                                ),
-                                onPressed: () {
-                                  showSearch(
-                                      context: context,
-                                      delegate: Search(
-                                          model.countryData,
-                                          model.setcountry,
-                                          model.fetchcountryData));
-                                  Future.delayed(Duration(milliseconds: 600),
-                                      () {
-                                    FlutterStatusbarcolor
-                                        .setStatusBarWhiteForeground(false);
-                                  });
+                            FutureBuilder(
+                                future: model.fetchAllcountries(),
+                                builder: (context, snapshot) {
+                                  return IconButton(
+                                      icon: Icon(
+                                        Icons.search,
+                                        color: Theme.of(context).brightness ==
+                                                Brightness.light
+                                            ? Colors.black87
+                                            : Colors.white54,
+                                      ),
+                                      onPressed: (!snapshot.hasData)
+                                          ? null
+                                          : () {
+                                              showSearch(
+                                                  context: context,
+                                                  delegate: Search(
+                                                      model.countryData,
+                                                      model.setcountry,
+                                                      model.fetchcountryData));
+                                              Future.delayed(
+                                                  Duration(milliseconds: 600),
+                                                  () {
+                                                FlutterStatusbarcolor
+                                                    .setStatusBarWhiteForeground(
+                                                        false);
+                                              });
+                                            });
                                 }),
                           ],
                         ),
@@ -154,11 +156,10 @@ class _HomeViewState extends State<HomeView> {
                                             : kTitleTextstyle,
                                       ),
                                       TextSpan(
-                                        text: (model.worldData == null)
+                                        text: (model.timeStamp == null)
                                             ? "..."
                                             : "Last Update " +
-                                                formatTime(
-                                                    model.worldData['updated']),
+                                                formatTime(model.timeStamp),
                                         style: TextStyle(
                                           color: kTextLightColor,
                                         ),
@@ -206,80 +207,94 @@ class _HomeViewState extends State<HomeView> {
                                   ),
                                 ],
                               ),
-                              child: model.worldData == null
-                                  ? CupertinoActivityIndicator()
-                                  : AnimatedContainer(
-                                      height: model.height,
-                                      child: Column(
-                                        children: <Widget>[
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: <Widget>[
-                                              Counter(
-                                                color: kInfectedColor,
-                                                number:
-                                                    model.worldData['cases'],
-                                                title: "Infected",
-                                              ),
-                                              Counter(
-                                                color: kDeathColor,
-                                                number:
-                                                    model.worldData['deaths'],
-                                                title: "Deaths",
-                                              ),
-                                              Counter(
-                                                color: kRecovercolor,
-                                                number: model
-                                                    .worldData['recovered'],
-                                                title: "Recovered",
-                                              ),
-                                            ],
-                                          ),
-                                          (!model.moreInfo)
-                                              ? SizedBox.shrink()
-                                              : Column(
+                              child: FutureBuilder(
+                                  future: (model.country == 'Global')
+                                      ? model.fetchWorldData()
+                                      : model.fetchcountryData(),
+                                  builder: (context, snapshot) {
+                                    return (!snapshot.hasData ||
+                                            model.worldData == null)
+                                        ? CupertinoActivityIndicator()
+                                        : AnimatedContainer(
+                                            height: model.height,
+                                            child: Column(
+                                              children: <Widget>[
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
                                                   children: <Widget>[
-                                                    SizedBox(
-                                                      height: 20,
+                                                    Counter(
+                                                      color: kInfectedColor,
+                                                      number: snapshot
+                                                          .data['cases'],
+                                                      title: "Infected",
                                                     ),
-                                                    MoreInfo(
-                                                      worldData:
-                                                          model.worldData,
+                                                    Counter(
+                                                      color: kDeathColor,
+                                                      number: snapshot
+                                                          .data['deaths'],
+                                                      title: "Deaths",
+                                                    ),
+                                                    Counter(
+                                                      color: kRecovercolor,
+                                                      number: snapshot
+                                                          .data['recovered'],
+                                                      title: "Recovered",
                                                     ),
                                                   ],
                                                 ),
-                                        ],
-                                      ),
-                                      duration: Duration(milliseconds: 500),
-                                    ),
+                                                (!model.moreInfo)
+                                                    ? SizedBox.shrink()
+                                                    : Column(
+                                                        children: <Widget>[
+                                                          SizedBox(
+                                                            height: 20,
+                                                          ),
+                                                          MoreInfo(
+                                                            worldData:
+                                                                snapshot.data,
+                                                          ),
+                                                        ],
+                                                      ),
+                                              ],
+                                            ),
+                                            duration:
+                                                Duration(milliseconds: 500),
+                                          );
+                                  }),
                             ),
                             SizedBox(height: 20),
                             (model.country == 'Global')
                                 ? Column(
                                     children: <Widget>[
-                                      model.mostAffected == null
-                                          ? Container(
-                                              padding: EdgeInsets.all(20),
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                                color: Theme.of(context)
-                                                            .brightness ==
-                                                        Brightness.dark
-                                                    ? Colors.blueGrey[900]
-                                                    : Colors.white,
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    offset: Offset(0, 4),
-                                                    blurRadius: 30,
-                                                    color: kShadowColor,
+                                      FutureBuilder(
+                                          future: model.fetchMostAffected(),
+                                          builder: (context, snapshot) {
+                                            if (!snapshot.hasData) {
+                                              return Container(
+                                                  padding: EdgeInsets.all(20),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            20),
+                                                    color: Theme.of(context)
+                                                                .brightness ==
+                                                            Brightness.dark
+                                                        ? Colors.blueGrey[900]
+                                                        : Colors.white,
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        offset: Offset(0, 4),
+                                                        blurRadius: 30,
+                                                        color: kShadowColor,
+                                                      ),
+                                                    ],
                                                   ),
-                                                ],
-                                              ),
-                                              child:
-                                                  CupertinoActivityIndicator())
-                                          : Column(
+                                                  child:
+                                                      CupertinoActivityIndicator());
+                                            }
+                                            return Column(
                                               children: <Widget>[
                                                 CarouselSlider(
                                                   options: CarouselOptions(
@@ -300,7 +315,7 @@ class _HomeViewState extends State<HomeView> {
                                                   items: [
                                                     MostAffected(
                                                       countryData:
-                                                          model.mostAffected,
+                                                          snapshot.data,
                                                       setCountry:
                                                           model.setcountry,
                                                       updateData: model
@@ -366,12 +381,40 @@ class _HomeViewState extends State<HomeView> {
                                                   }).toList(),
                                                 ),
                                               ],
-                                            )
+                                            );
+                                          })
                                     ],
                                   )
-                                : AnalysisGraph(
-                                    allhistoricalData: model.allhistoricalData,
-                                    linebar: model.linebar),
+                                : FutureBuilder(
+                                    future:
+                                        model.fetchHistoricalDatacountries(),
+                                    builder: (context, snapshot) {
+                                      return (!snapshot.hasData)
+                                          ? Container(
+                                              padding: EdgeInsets.all(20),
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                                color: Theme.of(context)
+                                                            .brightness ==
+                                                        Brightness.dark
+                                                    ? Colors.blueGrey[900]
+                                                    : Colors.white,
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    offset: Offset(0, 4),
+                                                    blurRadius: 30,
+                                                    color: kShadowColor,
+                                                  ),
+                                                ],
+                                              ),
+                                              child:
+                                                  CupertinoActivityIndicator())
+                                          : AnalysisGraph(
+                                              allhistoricalData:
+                                                  snapshot.data[0],
+                                              linebar: model.linebar);
+                                    }),
                           ],
                         ),
                       ),

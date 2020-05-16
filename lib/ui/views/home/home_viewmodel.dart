@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
-import 'package:connectivity/connectivity.dart';
 import 'package:covid_19/app/locator.dart';
 import 'package:covid_19/app/router.gr.dart';
 import 'package:flutter/material.dart';
@@ -13,8 +11,6 @@ import 'package:charts_flutter/flutter.dart' as charts;
 
 class HomeViewModel extends BaseViewModel {
   final NavigationService _navigationService = locator<NavigationService>();
-  Map _source = {ConnectivityResult.none: false};
-  MyConnectivity _connectivity = MyConnectivity.instance;
 
   String _country = 'Global';
   String get country => _country;
@@ -40,7 +36,11 @@ class HomeViewModel extends BaseViewModel {
 
   void setcountry(String country) {
     _country = country;
+    _linebar = null;
+    _worldData = null;
     notifyListeners();
+    // fetchcountryData();
+    // notifyListeners();
   }
 
   Map _worldData;
@@ -58,6 +58,9 @@ class HomeViewModel extends BaseViewModel {
   List _historicalData;
   List get historicalData => _historicalData;
 
+  int _timeStamp;
+  int get timeStamp => _timeStamp;
+
   List<charts.Series<TimeSeriesSales, DateTime>> _linebar;
   List<charts.Series<TimeSeriesSales, DateTime>> get linebar => _linebar;
 
@@ -65,21 +68,23 @@ class HomeViewModel extends BaseViewModel {
   Map get allhistoricalData => _allhistoricalData;
 
   fetchWorldData() async {
-    _worldData = null;
     http.Response response = await http.get('http://corona.lmao.ninja/v2/all');
     _worldData = json.decode(response.body);
-    notifyListeners();
+    _timeStamp = worldData['updated'];
+    // notifyListeners();
+    return _worldData;
   }
 
   fetchcountryData() async {
-    _allhistoricalData = null;
-    notifyListeners();
-    _worldData = null;
+    // _allhistoricalData = null;
+    // notifyListeners();
+    // _worldData = null;
     http.Response response =
         await http.get('https://disease.sh/v2/countries/' + country);
     _worldData = json.decode(response.body);
-    notifyListeners();
-    fetchHistoricalDatacountries();
+    // notifyListeners();
+    // fetchHistoricalDatacountries();
+    return _worldData;
   }
 
   fetchMostAffected() async {
@@ -89,20 +94,20 @@ class HomeViewModel extends BaseViewModel {
     response = await http
         .get('https://disease.sh/v2/countries?yesterday=true&sort=deaths');
     _mostAffectedYesterday = json.decode(response.body);
-    notifyListeners();
+    return _mostAffected;
   }
 
   fetchAllcountries() async {
     http.Response response = await http.get('https://disease.sh/v2/countries');
     _countryData = json.decode(response.body);
+    return _countryData;
   }
 
   fetchHistoricalDatacountries() async {
-    _allhistoricalData = null;
     http.Response response = await http
         .get('https://disease.sh/v2/historical/' + _country + '?lastdays=60');
     _allhistoricalData = json.decode(response.body);
-    _linebar = List<charts.Series<TimeSeriesSales, DateTime>>();
+    _linebar = new List<charts.Series<TimeSeriesSales, DateTime>>();
     _linebar.add(charts.Series(
       colorFn: (__, _) => charts.ColorUtil.fromDartColor(Colors.orange),
       id: 'cases',
@@ -124,7 +129,8 @@ class HomeViewModel extends BaseViewModel {
       measureFn: (TimeSeriesSales sales, _) => sales.sales,
       data: changedata(_allhistoricalData['timeline']['recovered']),
     ));
-    notifyListeners();
+    // notifyListeners();
+    return [_allhistoricalData, linebar];
   }
 
   List<TimeSeriesSales> changedata(Map<dynamic, dynamic> data) {
@@ -147,42 +153,4 @@ class TimeSeriesSales {
   final Color color;
 
   TimeSeriesSales(this.time, this.sales, this.color);
-}
-
-class MyConnectivity {
-  MyConnectivity._internal();
-
-  static final MyConnectivity _instance = MyConnectivity._internal();
-
-  static MyConnectivity get instance => _instance;
-
-  Connectivity connectivity = Connectivity();
-
-  StreamController controller = StreamController.broadcast();
-
-  Stream get myStream => controller.stream;
-
-  void initialise() async {
-    ConnectivityResult result = await connectivity.checkConnectivity();
-    _checkStatus(result);
-    connectivity.onConnectivityChanged.listen((result) {
-      _checkStatus(result);
-    });
-  }
-
-  void _checkStatus(ConnectivityResult result) async {
-    bool isOnline = false;
-    try {
-      final result = await InternetAddress.lookup('https://www.google.com');
-      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        isOnline = true;
-      } else
-        isOnline = false;
-    } on SocketException catch (_) {
-      isOnline = false;
-    }
-    controller.sink.add({result: isOnline});
-  }
-
-  void disposeStream() => controller.close();
 }

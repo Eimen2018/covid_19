@@ -93,7 +93,7 @@ class MostAffected extends StatelessWidget {
               return GestureDetector(
                 onTap: () {
                   setCountry(countryData[index]['country']);
-                  updateData();
+                  // updateData();
                 },
                 child: Container(
                   margin: EdgeInsets.only(bottom: 15),
