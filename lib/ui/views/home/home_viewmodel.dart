@@ -34,7 +34,7 @@ class HomeViewModel extends BaseViewModel {
   List get mostAffectedCases => _mostAffected;
 
   List _mostAffectedCasesYesterday;
-  List get mostAffectedCasesYesterday => _mostAffectedYesterday;
+  List get mostAffectedCasesYesterday => _mostAffectedCasesYesterday;
 
   List _countryData;
   List get countryData => _countryData;

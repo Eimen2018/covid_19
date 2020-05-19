@@ -1,5 +1,4 @@
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:connectivity/connectivity.dart';
 import 'package:covid_19/enums/connectivity_status.dart';
 import 'package:covid_19/ui/views/home/home_viewmodel.dart';
 import 'package:covid_19/ui/views/info/info_view.dart';
