@@ -21,12 +21,45 @@ class HomeViewModel extends BaseViewModel {
   bool _moreInfo = false;
   bool get moreInfo => _moreInfo;
 
+  Map _worldData;
+  Map get worldData => _worldData;
+
+  List _mostAffected;
+  List get mostAffected => _mostAffected;
+
+  List _mostAffectedYesterday;
+  List get mostAffectedYesterday => _mostAffectedYesterday;
+
+  List _mostAffectedCases;
+  List get mostAffectedCases => _mostAffected;
+
+  List _mostAffectedCasesYesterday;
+  List get mostAffectedCasesYesterday => _mostAffectedYesterday;
+
+  List _countryData;
+  List get countryData => _countryData;
+
+  List _historicalData;
+  List get historicalData => _historicalData;
+
+  int _timeStamp;
+  int get timeStamp => _timeStamp;
+
+  int _todayDeaths;
+  int get todayDeaths => _todayDeaths;
+
+  List<charts.Series<TimeSeriesSales, DateTime>> _linebar;
+  List<charts.Series<TimeSeriesSales, DateTime>> get linebar => _linebar;
+
+  Map _allhistoricalData;
+  Map get allhistoricalData => _allhistoricalData;
+
   void showHide() async {
-    if (_height == 300) {
+    if (_height == 310) {
       _height = 90;
       _moreInfo = false;
     } else if (_height == 90) {
-      _height = 300;
+      _height = 310;
       notifyListeners();
       await new Future.delayed(const Duration(milliseconds: 510));
       _moreInfo = true;
@@ -43,34 +76,18 @@ class HomeViewModel extends BaseViewModel {
     // notifyListeners();
   }
 
-  Map _worldData;
-  Map get worldData => _worldData;
-
-  List _mostAffected;
-  List get mostAffected => _mostAffected;
-
-  List _mostAffectedYesterday;
-  List get mostAffectedYesterday => _mostAffectedYesterday;
-
-  List _countryData;
-  List get countryData => _countryData;
-
-  List _historicalData;
-  List get historicalData => _historicalData;
-
-  int _timeStamp;
-  int get timeStamp => _timeStamp;
-
-  List<charts.Series<TimeSeriesSales, DateTime>> _linebar;
-  List<charts.Series<TimeSeriesSales, DateTime>> get linebar => _linebar;
-
-  Map _allhistoricalData;
-  Map get allhistoricalData => _allhistoricalData;
+  addcoma(int number) {
+    String num = number.toString();
+    num = num.replaceAllMapped(
+        new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+    return num;
+  }
 
   fetchWorldData() async {
-    http.Response response = await http.get('http://corona.lmao.ninja/v2/all');
+    http.Response response =  await http.get('http://corona.lmao.ninja/v2/all');
     _worldData = json.decode(response.body);
     _timeStamp = worldData['updated'];
+    _todayDeaths =  worldData['todayDeaths'];
     // notifyListeners();
     return _worldData;
   }
@@ -82,6 +99,8 @@ class HomeViewModel extends BaseViewModel {
     http.Response response =
         await http.get('https://disease.sh/v2/countries/' + country);
     _worldData = json.decode(response.body);
+    _timeStamp = worldData['updated'];
+    _todayDeaths = worldData['todayDeaths'];
     // notifyListeners();
     // fetchHistoricalDatacountries();
     return _worldData;
@@ -95,6 +114,16 @@ class HomeViewModel extends BaseViewModel {
         .get('https://disease.sh/v2/countries?yesterday=true&sort=deaths');
     _mostAffectedYesterday = json.decode(response.body);
     return _mostAffected;
+  }
+
+  fetchMostAffectedCases() async {
+    http.Response response =
+        await http.get('https://disease.sh/v2/countries?sort=cases');
+    _mostAffectedCases = json.decode(response.body);
+    response = await http
+        .get('https://disease.sh/v2/countries?yesterday=true&sort=cases');
+    _mostAffectedCasesYesterday = json.decode(response.body);
+    return _mostAffectedCases;
   }
 
   fetchAllcountries() async {

@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:covid_19/enums/connectivity_status.dart';
 import 'package:covid_19/ui/views/home/home_viewmodel.dart';
+import 'package:covid_19/ui/views/info/info_view.dart';
 import 'package:covid_19/widgets/analysisgraph.dart';
 import 'package:covid_19/widgets/counter.dart';
 import 'package:covid_19/widgets/moreinfo.dart';
@@ -54,6 +55,7 @@ class _HomeViewState extends State<HomeView> {
       onModelReady: (model) {},
       viewModelBuilder: () => HomeViewModel(),
       builder: (context, model, child) => Scaffold(
+        endDrawer: InfoView(),
         body: SingleChildScrollView(
           controller: controller,
           child: Column(
@@ -198,77 +200,140 @@ class _HomeViewState extends State<HomeView> {
                             ),
                             SizedBox(height: 20),
                             Container(
-                              padding: EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Colors.blueGrey[900]
-                                    : Colors.white,
-                                boxShadow: [
-                                  BoxShadow(
-                                    offset: Offset(0, 4),
-                                    blurRadius: 30,
-                                    color: kShadowColor,
-                                  ),
-                                ],
-                              ),
-                              child: FutureBuilder(
-                                  future: (model.country == 'Global')
-                                      ? model.fetchWorldData()
-                                      : model.fetchcountryData(),
-                                  builder: (context, snapshot) {
-                                    return (!snapshot.hasData ||
-                                            model.worldData == null)
-                                        ? CupertinoActivityIndicator()
-                                        : AnimatedContainer(
-                                            height: model.height,
-                                            child: Column(
+                                width: MediaQuery.of(context).size.width,
+                                // height: 130,
+                                padding: EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.blueGrey[900]
+                                      : Colors.white,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      offset: Offset(0, 4),
+                                      blurRadius: 30,
+                                      color: kShadowColor,
+                                    ),
+                                  ],
+                                ),
+                                child: FutureBuilder(
+                                    future: (model.country == 'Global')
+                                        ? model.fetchWorldData()
+                                        : model.fetchcountryData(),
+                                    builder: (context, snapshot) {
+                                      return (!snapshot.hasData ||
+                                              model.worldData == null)
+                                          ? CupertinoActivityIndicator()
+                                          : Column(
                                               children: <Widget>[
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: <Widget>[
-                                                    Counter(
-                                                      color: kInfectedColor,
-                                                      number: model
-                                                          .worldData['cases'],
-                                                      title: "Infected",
-                                                    ),
-                                                    Counter(
-                                                      color: kDeathColor,
-                                                      number: model
-                                                          .worldData['deaths'],
-                                                      title: "Deaths",
-                                                    ),
-                                                    Counter(
-                                                      color: kRecovercolor,
-                                                      number: model.worldData[
-                                                          'recovered'],
-                                                      title: "Recovered",
-                                                    ),
-                                                  ],
-                                                ),
-                                                (!model.moreInfo)
-                                                    ? SizedBox.shrink()
-                                                    : Column(
+                                                AnimatedContainer(
+                                                  duration: Duration(
+                                                      milliseconds: 500),
+                                                  height: model.height,
+                                                  child: Column(
+                                                    children: <Widget>[
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
                                                         children: <Widget>[
-                                                          SizedBox(
-                                                            height: 20,
+                                                          Counter(
+                                                            color:
+                                                                kInfectedColor,
+                                                            number:
+                                                                model.worldData[
+                                                                    'cases'],
+                                                            title: "Infected",
                                                           ),
-                                                          MoreInfo(
-                                                              worldData: model
-                                                                  .worldData),
+                                                          Counter(
+                                                            color: kDeathColor,
+                                                            number:
+                                                                model.worldData[
+                                                                    'deaths'],
+                                                            title: "Deaths",
+                                                          ),
+                                                          Counter(
+                                                            color:
+                                                                kRecovercolor,
+                                                            number: model
+                                                                    .worldData[
+                                                                'recovered'],
+                                                            title: "Recovered",
+                                                          ),
                                                         ],
                                                       ),
+                                                      (!model.moreInfo)
+                                                          ? SizedBox.shrink()
+                                                          : Column(
+                                                              children: <
+                                                                  Widget>[
+                                                                SizedBox(
+                                                                  height: 20,
+                                                                ),
+                                                                MoreInfo(
+                                                                    worldData: model
+                                                                        .worldData),
+                                                              ],
+                                                            ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                (model.height == 90)
+                                                    ? Padding(
+                                                        padding:
+                                                            EdgeInsets.fromLTRB(
+                                                                0, 10, 0, 0),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: <Widget>[
+                                                            AnimatedContainer(
+                                                                duration: Duration(
+                                                                    milliseconds:
+                                                                        500),
+                                                                padding: EdgeInsets
+                                                                    .symmetric(
+                                                                        horizontal:
+                                                                            30,
+                                                                        vertical:
+                                                                            5),
+                                                                decoration: BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            5),
+                                                                    border: Border.all(
+                                                                        color: Colors
+                                                                            .red)),
+                                                                child: Column(
+                                                                  children: <
+                                                                      Widget>[
+                                                                    Text(
+                                                                      model.addcoma(
+                                                                          model.worldData[
+                                                                              "todayCases"]),
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              20,
+                                                                          color:
+                                                                              Colors.red),
+                                                                    ),
+                                                                    Text(
+                                                                      "Today Cases",
+                                                                      style: kSubTextStyle.copyWith(
+                                                                          fontSize:
+                                                                              15),
+                                                                    )
+                                                                  ],
+                                                                ))
+                                                          ],
+                                                        ),
+                                                      )
+                                                    : SizedBox.shrink(),
                                               ],
-                                            ),
-                                            duration:
-                                                Duration(milliseconds: 500),
-                                          );
-                                  }),
-                            ),
+                                            );
+                                    })),
                             SizedBox(height: 20),
                             (model.country == 'Global')
                                 ? Column(
@@ -276,29 +341,6 @@ class _HomeViewState extends State<HomeView> {
                                       FutureBuilder(
                                           future: model.fetchMostAffected(),
                                           builder: (context, snapshot) {
-                                            if (!snapshot.hasData) {
-                                              return Container(
-                                                  padding: EdgeInsets.all(20),
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            20),
-                                                    color: Theme.of(context)
-                                                                .brightness ==
-                                                            Brightness.dark
-                                                        ? Colors.blueGrey[900]
-                                                        : Colors.white,
-                                                    boxShadow: [
-                                                      BoxShadow(
-                                                        offset: Offset(0, 4),
-                                                        blurRadius: 30,
-                                                        color: kShadowColor,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  child:
-                                                      CupertinoActivityIndicator());
-                                            }
                                             return Column(
                                               children: <Widget>[
                                                 CarouselSlider(
@@ -317,33 +359,205 @@ class _HomeViewState extends State<HomeView> {
                                                           _current = index;
                                                         });
                                                       }),
-                                                  items: [
-                                                    MostAffected(
-                                                      countryData:
-                                                          snapshot.data,
-                                                      setCountry:
-                                                          model.setcountry,
-                                                      updateData: model
-                                                          .fetchcountryData,
-                                                      date: 'Today',
-                                                    ),
-                                                    MostAffected(
-                                                      countryData: model
-                                                          .mostAffectedYesterday,
-                                                      setCountry:
-                                                          model.setcountry,
-                                                      updateData: model
-                                                          .fetchcountryData,
-                                                      date: 'Yesterday',
-                                                    ),
-                                                  ].map((i) {
-                                                    return Builder(
-                                                      builder: (BuildContext
-                                                          context) {
-                                                        return i;
-                                                      },
+                                                  items: (!snapshot.hasData)
+                                                      ? [
+                                                          Container(
+                                                              width:
+                                                                  MediaQuery.of(
+                                                                          context)
+                                                                      .size
+                                                                      .width,
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(20),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            20),
+                                                                boxShadow: [
+                                                                  BoxShadow(
+                                                                    offset:
+                                                                        Offset(
+                                                                            0,
+                                                                            4),
+                                                                    blurRadius:
+                                                                        30,
+                                                                    color:
+                                                                        kShadowColor,
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              child:
+                                                                  CupertinoActivityIndicator())
+                                                        ]
+                                                      : [
+                                                          MostAffected(
+                                                            name: "Deaths",
+                                                            color: Colors.red,
+                                                            countryData:
+                                                                snapshot.data,
+                                                            setCountry: model
+                                                                .setcountry,
+                                                            updateData: model
+                                                                .fetchcountryData,
+                                                            date: 'Today',
+                                                          ),
+                                                          MostAffected(
+                                                            name: "Deaths",
+                                                            color: Colors.red,
+                                                            countryData: model
+                                                                .mostAffectedYesterday,
+                                                            setCountry: model
+                                                                .setcountry,
+                                                            updateData: model
+                                                                .fetchcountryData,
+                                                            date: 'Yesterday',
+                                                          ),
+                                                        ].map((i) {
+                                                          return Builder(
+                                                            builder:
+                                                                (BuildContext
+                                                                    context) {
+                                                              return i;
+                                                            },
+                                                          );
+                                                        }).toList(),
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [1, 2].map((url) {
+                                                    int index =
+                                                        [1, 2].indexOf(url);
+                                                    return Container(
+                                                      width: 8.0,
+                                                      height: 8.0,
+                                                      margin:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 2.0),
+                                                      decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        color: _current == index
+                                                            ? Theme.of(context)
+                                                                        .brightness ==
+                                                                    Brightness
+                                                                        .light
+                                                                ? Color.fromRGBO(
+                                                                    0,
+                                                                    0,
+                                                                    0,
+                                                                    0.9)
+                                                                : Colors.white
+                                                            : Theme.of(context)
+                                                                        .brightness ==
+                                                                    Brightness
+                                                                        .light
+                                                                ? Color
+                                                                    .fromRGBO(
+                                                                        0,
+                                                                        0,
+                                                                        0,
+                                                                        0.4)
+                                                                : Colors.grey,
+                                                      ),
                                                     );
                                                   }).toList(),
+                                                ),
+                                              ],
+                                            );
+                                          }),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      FutureBuilder(
+                                          future:
+                                              model.fetchMostAffectedCases(),
+                                          builder: (context, snapshot) {
+                                            return Column(
+                                              children: <Widget>[
+                                                CarouselSlider(
+                                                  options: CarouselOptions(
+                                                      height: 340.0,
+                                                      aspectRatio: 1.0,
+                                                      viewportFraction: 1.2,
+                                                      initialPage: 0,
+                                                      scrollDirection:
+                                                          Axis.horizontal,
+                                                      enableInfiniteScroll:
+                                                          false,
+                                                      onPageChanged:
+                                                          (index, reason) {
+                                                        setState(() {
+                                                          _current = index;
+                                                        });
+                                                      }),
+                                                  items: (!snapshot.hasData)
+                                                      ? [
+                                                          Container(
+                                                              width:
+                                                                  MediaQuery.of(
+                                                                          context)
+                                                                      .size
+                                                                      .width,
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(20),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            20),
+                                                                boxShadow: [
+                                                                  BoxShadow(
+                                                                    offset:
+                                                                        Offset(
+                                                                            0,
+                                                                            4),
+                                                                    blurRadius:
+                                                                        30,
+                                                                    color:
+                                                                        kShadowColor,
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              child:
+                                                                  CupertinoActivityIndicator())
+                                                        ]
+                                                      : [
+                                                          MostAffected(
+                                                            name: "Cases",
+                                                            color: Colors.green,
+                                                            countryData:
+                                                                snapshot.data,
+                                                            setCountry: model
+                                                                .setcountry,
+                                                            updateData: model
+                                                                .fetchcountryData,
+                                                            date: 'Today',
+                                                          ),
+                                                          MostAffected(
+                                                            name: "Cases",
+                                                            color: Colors.green,
+                                                            countryData: model
+                                                                .mostAffectedCasesYesterday,
+                                                            setCountry: model
+                                                                .setcountry,
+                                                            updateData: model
+                                                                .fetchcountryData,
+                                                            date: 'Yesterday',
+                                                          ),
+                                                        ].map((i) {
+                                                          return Builder(
+                                                            builder:
+                                                                (BuildContext
+                                                                    context) {
+                                                              return i;
+                                                            },
+                                                          );
+                                                        }).toList(),
                                                 ),
                                                 Row(
                                                   mainAxisAlignment:

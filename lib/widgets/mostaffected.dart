@@ -6,6 +6,8 @@ class MostAffected extends StatelessWidget {
   final Function setCountry;
   final Function updateData;
   final String date;
+  final String name;
+  final Color color;
 
   const MostAffected({
     Key key,
@@ -13,6 +15,8 @@ class MostAffected extends StatelessWidget {
     this.setCountry,
     this.updateData,
     this.date,
+    this.name,
+    this.color,
   }) : super(key: key);
   addcoma(int number) {
     String num = number.toString();
@@ -34,7 +38,8 @@ class MostAffected extends StatelessWidget {
                 "Most Affected\n Countries",
                 style: Theme.of(context).brightness == Brightness.dark
                     ? kTitleTextstyle.copyWith(color: Colors.white)
-                    : kTitleTextstyle,textAlign: TextAlign.center,
+                    : kTitleTextstyle,
+                textAlign: TextAlign.center,
               ),
               Container(
                 width: 140,
@@ -44,8 +49,7 @@ class MostAffected extends StatelessWidget {
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 5, vertical: 3),
                       decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(5)),
+                          color: color, borderRadius: BorderRadius.circular(5)),
                       child: Text(date,
                           style: TextStyle(
                               color: Colors.white,
@@ -53,9 +57,9 @@ class MostAffected extends StatelessWidget {
                               fontSize: 12)),
                     ),
                     Text(
-                      "Deaths",
+                      name,
                       style: TextStyle(
-                          color: Colors.red,
+                          color: color,
                           fontWeight: FontWeight.w600,
                           fontSize: 12),
                     )
@@ -122,7 +126,7 @@ class MostAffected extends StatelessWidget {
                               padding: EdgeInsets.symmetric(
                                   horizontal: 5, vertical: 3),
                               decoration: BoxDecoration(
-                                  color: Colors.red,
+                                  color: color,
                                   borderRadius: BorderRadius.circular(5)),
                               child: Text(
                                   "+ " +

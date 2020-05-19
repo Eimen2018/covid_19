@@ -37,7 +37,8 @@ class MyApp extends StatelessWidget {
       },
       themedWidgetBuilder: (context, theme) {
         return StreamProvider<ConnectivityStatus>(
-          create: (context)=> ConnectivityService().connectionStatusController.stream,
+          create: (context) =>
+              ConnectivityService().connectionStatusController.stream,
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'Covid 19',
@@ -45,6 +46,7 @@ class MyApp extends StatelessWidget {
             initialRoute: Routes.homeView,
             onGenerateRoute: Router().onGenerateRoute,
             navigatorKey: locator<NavigationService>().navigatorKey,
+            // darkTheme: ThemeData(scaffoldBackgroundColor: Colors.black87),
           ),
         );
       },

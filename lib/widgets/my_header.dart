@@ -13,14 +13,14 @@ class MyHeader extends StatefulWidget {
   final String textBottom;
   final double offset;
   final String page;
-  const MyHeader(
-      {Key key,
-      this.image,
-      this.textTop,
-      this.textBottom,
-      this.offset,
-      this.page})
-      : super(key: key);
+  const MyHeader({
+    Key key,
+    this.image,
+    this.textTop,
+    this.textBottom,
+    this.offset,
+    this.page,
+  }) : super(key: key);
 
   @override
   _MyHeaderState createState() => _MyHeaderState();
@@ -60,11 +60,12 @@ class _MyHeaderState extends State<MyHeader> {
               : CrossAxisAlignment.end,
           children: <Widget>[
             GestureDetector(
-              onTap: () async {
+              onTap: () {
                 if (widget.page == "Info")
-                  await _navigationService.navigateTo(Routes.homeView);
+                  Navigator.of(context).pop();
                 else
-                  await _navigationService.navigateTo(Routes.infoViewRoute);
+                  Scaffold.of(context).openEndDrawer();
+                // await _navigationService.navigateTo(Routes.infoViewRoute);
               },
               child: widget.page == "Info"
                   ? Row(
@@ -103,7 +104,8 @@ class _MyHeaderState extends State<MyHeader> {
                           width: 10,
                         ),
                         Container(
-                            padding: EdgeInsets.all(5),
+                          // color: Colors.yellow,
+                            padding: EdgeInsets.all(10),
                             child: SvgPicture.asset("assets/icons/menu.svg")),
                       ],
                     ),

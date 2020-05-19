@@ -50,7 +50,11 @@ class Counter extends StatelessWidget {
             color: color,
           ),
         ),
-        Text(title, style: kSubTextStyle,textAlign: TextAlign.center,),
+        Text(
+          title,
+          style: kSubTextStyle,
+          textAlign: TextAlign.center,
+        ),
       ],
     );
   }
