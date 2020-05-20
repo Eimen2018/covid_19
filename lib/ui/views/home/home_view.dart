@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:covid_19/enums/connectivity_status.dart';
 import 'package:covid_19/ui/views/home/home_viewmodel.dart';
@@ -7,12 +9,14 @@ import 'package:covid_19/widgets/counter.dart';
 import 'package:covid_19/widgets/moreinfo.dart';
 import 'package:covid_19/widgets/mostaffected.dart';
 import 'package:covid_19/widgets/my_header.dart';
+import 'package:covid_19/widgets/recent.dart';
 import 'package:covid_19/widgets/search.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stacked/stacked.dart';
 import 'package:time_formatter/time_formatter.dart';
 import '../../../constant.dart';
@@ -27,12 +31,6 @@ class _HomeViewState extends State<HomeView> {
   double offset = 0;
 
   @override
-  void initState() {
-    super.initState();
-    controller.addListener(onScroll);
-  }
-
-  @override
   void dispose() {
     controller.dispose();
     super.dispose();
@@ -44,14 +42,25 @@ class _HomeViewState extends State<HomeView> {
     });
   }
 
+  SharedPreferences prefs;
+
+  @override
+  void initState() {
+    super.initState();
+    controller.addListener(onScroll);
+  }
+
   int _current = 0;
+  int _current2 = 0;
 
   @override
   Widget build(BuildContext context) {
     var connectionStatus = Provider.of<ConnectivityStatus>(context);
     return ViewModelBuilder<HomeViewModel>.reactive(
       // createNewModelOnInsert: true,
-      onModelReady: (model) {},
+      onModelReady: (model) async {
+        prefs = await SharedPreferences.getInstance();
+      },
       viewModelBuilder: () => HomeViewModel(),
       builder: (context, model, child) => Scaffold(
         endDrawer: InfoView(),
@@ -77,25 +86,26 @@ class _HomeViewState extends State<HomeView> {
                       ),
                     )
                   : Column(children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.symmetric(horizontal: 20),
-                        padding:
-                            EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                        height: 60,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.blueGrey[900]
-                              : Colors.white,
-                          borderRadius: BorderRadius.circular(25),
-                          border: Border.all(
-                            color: Color(0xFFE5E5E5),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            GestureDetector(
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            padding: EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.blueGrey[900]
+                                  : Colors.white,
+                              borderRadius: BorderRadius.circular(7),
+                              border: Border.all(
+                                color: Color(0xFFE5E5E5),
+                              ),
+                            ),
+                            child: GestureDetector(
+                              onLongPress: () {
+                                model.setcountry('Global');
+                                prefs.clear();
+                              },
                               onTap: () {
                                 model.setcountry('Global');
                               },
@@ -104,46 +114,97 @@ class _HomeViewState extends State<HomeView> {
                                 width: 20,
                               ),
                             ),
-                            Text(
-                              model.country,
-                              style: kSubTextStyle.copyWith(
-                                  color: Theme.of(context).brightness ==
-                                          Brightness.light
-                                      ? Colors.black87
-                                      : Colors.white),
-                            ),
-                            FutureBuilder(
-                                future: model.fetchAllcountries(),
-                                builder: (context, snapshot) {
-                                  return IconButton(
-                                      icon: Icon(
-                                        Icons.search,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              showSearch(
+                                  context: context,
+                                  delegate: Search(
+                                      countryList: model.countryData,
+                                      setCountry: model.setcountry,
+                                      updateWorlddata: model.fetchcountryData,
+                                      prefs: prefs));
+                              Future.delayed(Duration(milliseconds: 600), () {
+                                FlutterStatusbarcolor
+                                    .setStatusBarWhiteForeground(false);
+                              });
+                            },
+                            child: Container(
+                              margin: EdgeInsets.symmetric(horizontal: 10),
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 20),
+                              height: 60,
+                              width: MediaQuery.of(context).size.width - 100,
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.blueGrey[900]
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: Color(0xFFE5E5E5),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Text(
+                                    model.country,
+                                    style: kSubTextStyle.copyWith(
                                         color: Theme.of(context).brightness ==
                                                 Brightness.light
                                             ? Colors.black87
-                                            : Colors.white54,
-                                      ),
-                                      onPressed: (!snapshot.hasData)
-                                          ? null
-                                          : () {
-                                              showSearch(
-                                                  context: context,
-                                                  delegate: Search(
-                                                      model.countryData,
-                                                      model.setcountry,
-                                                      model.fetchcountryData));
-                                              Future.delayed(
-                                                  Duration(milliseconds: 600),
-                                                  () {
-                                                FlutterStatusbarcolor
-                                                    .setStatusBarWhiteForeground(
-                                                        false);
-                                              });
-                                            });
-                                }),
-                          ],
-                        ),
+                                            : Colors.white),
+                                  ),
+                                  FutureBuilder(
+                                      future: model.fetchAllcountries(),
+                                      builder: (context, snapshot) {
+                                        return IconButton(
+                                          icon: Icon(
+                                            Icons.search,
+                                            color:
+                                                Theme.of(context).brightness ==
+                                                        Brightness.light
+                                                    ? Colors.black87
+                                                    : Colors.white54,
+                                          ),
+                                          onPressed: (!snapshot.hasData)
+                                              ? null
+                                              : () {
+                                                  showSearch(
+                                                      context: context,
+                                                      delegate: Search(
+                                                          countryList:
+                                                              model.countryData,
+                                                          setCountry:
+                                                              model.setcountry,
+                                                          updateWorlddata: model
+                                                              .fetchcountryData,
+                                                          prefs: prefs));
+                                                  Future.delayed(
+                                                      Duration(
+                                                          milliseconds: 600),
+                                                      () {
+                                                    FlutterStatusbarcolor
+                                                        .setStatusBarWhiteForeground(
+                                                            false);
+                                                  });
+                                                },
+                                        );
+                                      }),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
+                      (prefs.getStringList('country') != null)
+                          ? Recent(
+                              prefs: prefs,
+                              setCountry: model.setcountry,
+                            )
+                          : SizedBox.shrink(),
                       SizedBox(height: 20),
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 20),
@@ -200,7 +261,7 @@ class _HomeViewState extends State<HomeView> {
                             SizedBox(height: 20),
                             Container(
                                 width: MediaQuery.of(context).size.width,
-                                // height: 130,
+                                // height: (model.height==90)?210:null,
                                 padding: EdgeInsets.all(20),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(20),
@@ -221,117 +282,100 @@ class _HomeViewState extends State<HomeView> {
                                         ? model.fetchWorldData()
                                         : model.fetchcountryData(),
                                     builder: (context, snapshot) {
-                                      return (!snapshot.hasData ||
-                                              model.worldData == null)
-                                          ? CupertinoActivityIndicator()
-                                          : Column(
+                                      // if (!snapshot.hasData)
+                                      //   return CupertinoActivityIndicator();
+                                       if (model.worldData == null)
+                                        return CupertinoActivityIndicator();
+                                      return Column(
+                                        children: <Widget>[
+                                          AnimatedContainer(
+                                            duration:
+                                                Duration(milliseconds: 500),
+                                            height: model.height,
+                                            child: Column(
                                               children: <Widget>[
-                                                AnimatedContainer(
-                                                  duration: Duration(
-                                                      milliseconds: 500),
-                                                  height: model.height,
-                                                  child: Column(
-                                                    children: <Widget>[
-                                                      Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: <Widget>[
+                                                    Counter(
+                                                      color: kInfectedColor,
+                                                      number: model
+                                                          .worldData['cases'],
+                                                      title: "Infected",
+                                                    ),
+                                                    Counter(
+                                                      color: kDeathColor,
+                                                      number: model
+                                                          .worldData['deaths'],
+                                                      title: "Deaths",
+                                                    ),
+                                                    Counter(
+                                                      color: kRecovercolor,
+                                                      number: model.worldData[
+                                                          'recovered'],
+                                                      title: "Recovered",
+                                                    ),
+                                                  ],
+                                                ),
+                                                (!model.moreInfo)
+                                                    ? SizedBox.shrink()
+                                                    : Column(
                                                         children: <Widget>[
-                                                          Counter(
-                                                            color:
-                                                                kInfectedColor,
-                                                            number:
-                                                                model.worldData[
-                                                                    'cases'],
-                                                            title: "Infected",
+                                                          SizedBox(
+                                                            height: 20,
                                                           ),
-                                                          Counter(
-                                                            color: kDeathColor,
-                                                            number:
-                                                                model.worldData[
-                                                                    'deaths'],
-                                                            title: "Deaths",
-                                                          ),
-                                                          Counter(
-                                                            color:
-                                                                kRecovercolor,
-                                                            number: model
-                                                                    .worldData[
-                                                                'recovered'],
-                                                            title: "Recovered",
-                                                          ),
+                                                          MoreInfo(
+                                                              worldData: model
+                                                                  .worldData),
                                                         ],
                                                       ),
-                                                      (!model.moreInfo)
-                                                          ? SizedBox.shrink()
-                                                          : Column(
-                                                              children: <
-                                                                  Widget>[
-                                                                SizedBox(
-                                                                  height: 20,
-                                                                ),
-                                                                MoreInfo(
-                                                                    worldData: model
-                                                                        .worldData),
-                                                              ],
-                                                            ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                (model.height == 90)
-                                                    ? Padding(
-                                                        padding:
-                                                            EdgeInsets.fromLTRB(
-                                                                0, 10, 0, 0),
-                                                        child: Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: <Widget>[
-                                                            AnimatedContainer(
-                                                                duration: Duration(
-                                                                    milliseconds:
-                                                                        500),
-                                                                padding: EdgeInsets
-                                                                    .symmetric(
-                                                                        horizontal:
-                                                                            30,
-                                                                        vertical:
-                                                                            5),
-                                                                decoration: BoxDecoration(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            5),
-                                                                    border: Border.all(
-                                                                        color: Colors
-                                                                            .red)),
-                                                                child: Column(
-                                                                  children: <
-                                                                      Widget>[
-                                                                    Text(
-                                                                      model.addcoma(
-                                                                          model.worldData[
-                                                                              "todayCases"]),
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              20,
-                                                                          color:
-                                                                              Colors.red),
-                                                                    ),
-                                                                    Text(
-                                                                      "Today Cases",
-                                                                      style: kSubTextStyle.copyWith(
-                                                                          fontSize:
-                                                                              15),
-                                                                    )
-                                                                  ],
-                                                                ))
-                                                          ],
-                                                        ),
-                                                      )
-                                                    : SizedBox.shrink(),
                                               ],
-                                            );
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.fromLTRB(
+                                                0, 10, 0, 0),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: <Widget>[
+                                                Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 30,
+                                                            vertical: 5),
+                                                    decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(5),
+                                                        border: Border.all(
+                                                            color: Colors.red)),
+                                                    child: Column(
+                                                      children: <Widget>[
+                                                        Text(
+                                                          model.addcoma(model
+                                                                  .worldData[
+                                                              "todayCases"]),
+                                                          style: TextStyle(
+                                                              fontSize: 20,
+                                                              color:
+                                                                  Colors.red),
+                                                        ),
+                                                        Text(
+                                                          "Today Cases",
+                                                          style: kSubTextStyle
+                                                              .copyWith(
+                                                                  fontSize: 15),
+                                                        )
+                                                      ],
+                                                    ))
+                                              ],
+                                            ),
+                                          )
+                                        ],
+                                      );
                                     })),
                             SizedBox(height: 20),
                             (model.country == 'Global')
@@ -393,6 +437,8 @@ class _HomeViewState extends State<HomeView> {
                                                         ]
                                                       : [
                                                           MostAffected(
+                                                            type:
+                                                                "Highest Fatality By\nCountry",
                                                             name: "Deaths",
                                                             color: Colors.red,
                                                             countryData:
@@ -404,6 +450,8 @@ class _HomeViewState extends State<HomeView> {
                                                             date: 'Today',
                                                           ),
                                                           MostAffected(
+                                                            type:
+                                                                "Highest Fatal By\nCountry",
                                                             name: "Deaths",
                                                             color: Colors.red,
                                                             countryData: model
@@ -489,7 +537,7 @@ class _HomeViewState extends State<HomeView> {
                                                       onPageChanged:
                                                           (index, reason) {
                                                         setState(() {
-                                                          _current = index;
+                                                          _current2 = index;
                                                         });
                                                       }),
                                                   items: (!snapshot.hasData)
@@ -527,6 +575,8 @@ class _HomeViewState extends State<HomeView> {
                                                         ]
                                                       : [
                                                           MostAffected(
+                                                            type:
+                                                                "Highest Case By\nCountry",
                                                             name: "Cases",
                                                             color: Colors.green,
                                                             countryData:
@@ -538,6 +588,8 @@ class _HomeViewState extends State<HomeView> {
                                                             date: 'Today',
                                                           ),
                                                           MostAffected(
+                                                            type:
+                                                                "Highest Case By\nCountry",
                                                             name: "Cases",
                                                             color: Colors.green,
                                                             countryData: model
@@ -572,16 +624,18 @@ class _HomeViewState extends State<HomeView> {
                                                               horizontal: 2.0),
                                                       decoration: BoxDecoration(
                                                         shape: BoxShape.circle,
-                                                        color: _current == index
+                                                        color: _current2 ==
+                                                                index
                                                             ? Theme.of(context)
                                                                         .brightness ==
                                                                     Brightness
                                                                         .light
-                                                                ? Color.fromRGBO(
-                                                                    0,
-                                                                    0,
-                                                                    0,
-                                                                    0.9)
+                                                                ? Color
+                                                                    .fromRGBO(
+                                                                        0,
+                                                                        0,
+                                                                        0,
+                                                                        0.9)
                                                                 : Colors.white
                                                             : Theme.of(context)
                                                                         .brightness ==
@@ -629,8 +683,7 @@ class _HomeViewState extends State<HomeView> {
                                               child:
                                                   CupertinoActivityIndicator())
                                           : AnalysisGraph(
-                                              allhistoricalData:
-                                                  snapshot.data[0],
+                                              allhistoricalData: snapshot.data,
                                               linebar: model.linebar);
                                     }),
                           ],

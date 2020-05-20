@@ -8,6 +8,7 @@ class MostAffected extends StatelessWidget {
   final String date;
   final String name;
   final Color color;
+  final String type;
 
   const MostAffected({
     Key key,
@@ -17,6 +18,7 @@ class MostAffected extends StatelessWidget {
     this.date,
     this.name,
     this.color,
+    this.type,
   }) : super(key: key);
   addcoma(int number) {
     String num = number.toString();
@@ -35,14 +37,14 @@ class MostAffected extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Text(
-                "Most Affected\n Countries",
+                type ?? "Most Affected\n Countries",
                 style: Theme.of(context).brightness == Brightness.dark
                     ? kTitleTextstyle.copyWith(color: Colors.white)
                     : kTitleTextstyle,
                 textAlign: TextAlign.center,
               ),
               Container(
-                width: 140,
+                width: MediaQuery.of(context).size.width - 220,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
@@ -73,9 +75,9 @@ class MostAffected extends StatelessWidget {
           height: 10,
         ),
         Container(
-          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
           height: 270,
-          width: MediaQuery.of(context).size.width - 40,
+          width: MediaQuery.of(context).size.width - 30,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
             color: Theme.of(context).brightness == Brightness.dark
@@ -106,10 +108,14 @@ class MostAffected extends StatelessWidget {
                     children: <Widget>[
                       Row(
                         children: <Widget>[
+                          SizedBox(
+                            width: 10,
+                          ),
                           Image.network(
                             countryData[index]['countryInfo']['flag'],
                             height: 30,
-                            width: 100,
+                            width: 50,
+                            fit: BoxFit.fill,
                           ),
                           SizedBox(
                             width: 10,
@@ -118,9 +124,9 @@ class MostAffected extends StatelessWidget {
                         ],
                       ),
                       Container(
-                        width: 120,
+                        width: 150,
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: <Widget>[
                             Container(
                               padding: EdgeInsets.symmetric(
@@ -130,15 +136,15 @@ class MostAffected extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(5)),
                               child: Text(
                                   "+ " +
-                                      countryData[index]['todayDeaths']
+                                      countryData[index]['today' + name]
                                           .toString(),
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w600)),
                             ),
                             Text(
-                              addcoma(countryData[index]['deaths']),
-                              style: TextStyle(color: Colors.red),
+                              addcoma(countryData[index][name.toLowerCase()]),
+                              style: TextStyle(color: color),
                             ),
                           ],
                         ),

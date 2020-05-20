@@ -21,7 +21,6 @@ StreamController<ConnectivityStatus> connectionStatusController = StreamControll
         return ConnectivityStatus.Wifi;
       case ConnectivityResult.none:
         return ConnectivityStatus.Offline;
-
       default:
         return ConnectivityStatus.Offline;
     }

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:covid_19/app/locator.dart';
 import 'package:covid_19/app/router.gr.dart';
 import 'package:flutter/material.dart';
@@ -45,14 +46,15 @@ class HomeViewModel extends BaseViewModel {
   int _timeStamp;
   int get timeStamp => _timeStamp;
 
-  int _todayDeaths;
-  int get todayDeaths => _todayDeaths;
-
   List<charts.Series<TimeSeriesSales, DateTime>> _linebar;
   List<charts.Series<TimeSeriesSales, DateTime>> get linebar => _linebar;
 
   Map _allhistoricalData;
   Map get allhistoricalData => _allhistoricalData;
+
+
+
+  
 
   void showHide() async {
     if (_height == 310) {
@@ -69,8 +71,9 @@ class HomeViewModel extends BaseViewModel {
 
   void setcountry(String country) {
     _country = country;
-    _linebar = null;
     _worldData = null;
+    _linebar = null;
+    _allhistoricalData = null;
     notifyListeners();
     // fetchcountryData();
     // notifyListeners();
@@ -84,10 +87,14 @@ class HomeViewModel extends BaseViewModel {
   }
 
   fetchWorldData() async {
-    http.Response response =  await http.get('http://corona.lmao.ninja/v2/all');
-    _worldData = json.decode(response.body);
-    _timeStamp = worldData['updated'];
-    _todayDeaths =  worldData['todayDeaths'];
+    try {
+      http.Response response =
+          await http.get('http://corona.lmao.ninja/v2/all');
+      _worldData = json.decode(response.body);
+      _timeStamp = worldData['updated'];
+    } catch (e) {
+      print(e);
+    }
     // notifyListeners();
     return _worldData;
   }
@@ -96,70 +103,90 @@ class HomeViewModel extends BaseViewModel {
     // _allhistoricalData = null;
     // notifyListeners();
     // _worldData = null;
-    http.Response response =
-        await http.get('https://disease.sh/v2/countries/' + country);
-    _worldData = json.decode(response.body);
-    _timeStamp = worldData['updated'];
-    _todayDeaths = worldData['todayDeaths'];
+    try {
+      http.Response response =
+          await http.get('https://disease.sh/v2/countries/' + country);
+      _worldData = json.decode(response.body);
+      _timeStamp = worldData['updated'];
+    } catch (e) {
+      print(e);
+    }
     // notifyListeners();
     // fetchHistoricalDatacountries();
     return _worldData;
   }
 
   fetchMostAffected() async {
-    http.Response response =
-        await http.get('https://disease.sh/v2/countries?sort=deaths');
-    _mostAffected = json.decode(response.body);
-    response = await http
-        .get('https://disease.sh/v2/countries?yesterday=true&sort=deaths');
-    _mostAffectedYesterday = json.decode(response.body);
+    try {
+      http.Response response =
+          await http.get('https://disease.sh/v2/countries?sort=deaths');
+      _mostAffected = json.decode(response.body);
+      response = await http
+          .get('https://disease.sh/v2/countries?yesterday=true&sort=deaths');
+      _mostAffectedYesterday = json.decode(response.body);
+    } catch (e) {
+      print(e);
+    }
     return _mostAffected;
   }
 
   fetchMostAffectedCases() async {
-    http.Response response =
-        await http.get('https://disease.sh/v2/countries?sort=cases');
-    _mostAffectedCases = json.decode(response.body);
-    response = await http
-        .get('https://disease.sh/v2/countries?yesterday=true&sort=cases');
-    _mostAffectedCasesYesterday = json.decode(response.body);
+    try {
+      http.Response response =
+          await http.get('https://disease.sh/v2/countries?sort=cases');
+      _mostAffectedCases = json.decode(response.body);
+      response = await http
+          .get('https://disease.sh/v2/countries?yesterday=true&sort=cases');
+      _mostAffectedCasesYesterday = json.decode(response.body);
+    } catch (e) {
+      print(e);
+    }
     return _mostAffectedCases;
   }
 
   fetchAllcountries() async {
-    http.Response response = await http.get('https://disease.sh/v2/countries');
-    _countryData = json.decode(response.body);
+    try {
+      http.Response response =
+          await http.get('https://disease.sh/v2/countries');
+      _countryData = json.decode(response.body);
+    } catch (e) {
+      print(e);
+    }
     return _countryData;
   }
 
   fetchHistoricalDatacountries() async {
-    http.Response response = await http
-        .get('https://disease.sh/v2/historical/' + _country + '?lastdays=60');
-    _allhistoricalData = json.decode(response.body);
-    _linebar = new List<charts.Series<TimeSeriesSales, DateTime>>();
-    _linebar.add(charts.Series(
-      colorFn: (__, _) => charts.ColorUtil.fromDartColor(Colors.orange),
-      id: 'cases',
-      domainFn: (TimeSeriesSales sales, _) => sales.time,
-      measureFn: (TimeSeriesSales sales, _) => sales.sales,
-      data: changedata(_allhistoricalData['timeline']['cases']),
-    ));
-    _linebar.add(charts.Series(
-      colorFn: (__, _) => charts.ColorUtil.fromDartColor(Colors.red),
-      id: 'deaths',
-      domainFn: (TimeSeriesSales sales, _) => sales.time,
-      measureFn: (TimeSeriesSales sales, _) => sales.sales,
-      data: changedata(_allhistoricalData['timeline']['deaths']),
-    ));
-    _linebar.add(charts.Series(
-      colorFn: (__, _) => charts.ColorUtil.fromDartColor(Colors.green),
-      id: 'recovered',
-      domainFn: (TimeSeriesSales sales, _) => sales.time,
-      measureFn: (TimeSeriesSales sales, _) => sales.sales,
-      data: changedata(_allhistoricalData['timeline']['recovered']),
-    ));
+    try {
+      http.Response response = await http
+          .get('https://disease.sh/v2/historical/' + _country + '?lastdays=60');
+      _allhistoricalData = json.decode(response.body);
+      _linebar = new List<charts.Series<TimeSeriesSales, DateTime>>();
+      _linebar.add(charts.Series(
+        colorFn: (__, _) => charts.ColorUtil.fromDartColor(Colors.orange),
+        id: 'cases',
+        domainFn: (TimeSeriesSales sales, _) => sales.time,
+        measureFn: (TimeSeriesSales sales, _) => sales.sales,
+        data: changedata(_allhistoricalData['timeline']['cases']),
+      ));
+      _linebar.add(charts.Series(
+        colorFn: (__, _) => charts.ColorUtil.fromDartColor(Colors.red),
+        id: 'deaths',
+        domainFn: (TimeSeriesSales sales, _) => sales.time,
+        measureFn: (TimeSeriesSales sales, _) => sales.sales,
+        data: changedata(_allhistoricalData['timeline']['deaths']),
+      ));
+      _linebar.add(charts.Series(
+        colorFn: (__, _) => charts.ColorUtil.fromDartColor(Colors.green),
+        id: 'recovered',
+        domainFn: (TimeSeriesSales sales, _) => sales.time,
+        measureFn: (TimeSeriesSales sales, _) => sales.sales,
+        data: changedata(_allhistoricalData['timeline']['recovered']),
+      ));
+    } catch (e) {
+      print(e);
+    }
     // notifyListeners();
-    return [_allhistoricalData, linebar];
+    return _allhistoricalData;
   }
 
   List<TimeSeriesSales> changedata(Map<dynamic, dynamic> data) {

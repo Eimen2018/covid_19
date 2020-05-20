@@ -1,11 +1,8 @@
-import 'package:covid_19/app/locator.dart';
-import 'package:covid_19/app/router.gr.dart';
 import 'package:covid_19/constant.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:stacked_services/stacked_services.dart';
 
 class MyHeader extends StatefulWidget {
   final String image;
@@ -27,7 +24,6 @@ class MyHeader extends StatefulWidget {
 }
 
 class _MyHeaderState extends State<MyHeader> {
-  final NavigationService _navigationService = locator<NavigationService>();
 
   @override
   Widget build(BuildContext context) {

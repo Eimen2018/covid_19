@@ -36,11 +36,13 @@ class AnalysisGraph extends StatelessWidget {
                     // color: Colors.white,
                     width: MediaQuery.of(context).size.width,
                     height: 270,
-                    child: charts.TimeSeriesChart(
-                      linebar,
-                      animate: true,
-                      animationDuration: Duration(seconds: 1),
-                    ),
+                    child: (allhistoricalData['message']!=null)
+                        ? Center(child: Text("No Data for this country"))
+                        : charts.TimeSeriesChart(
+                            linebar,
+                            animate: true,
+                            animationDuration: Duration(seconds: 1),
+                          ),
                   )
           ],
         ),
