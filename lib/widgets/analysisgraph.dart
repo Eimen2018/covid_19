@@ -13,7 +13,7 @@ class AnalysisGraph extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 310,
+      height: 350,
       child: Center(
         child: Column(
           children: <Widget>[
@@ -35,13 +35,13 @@ class AnalysisGraph extends StatelessWidget {
                 : Container(
                     // color: Colors.white,
                     width: MediaQuery.of(context).size.width,
-                    height: 270,
+                    height: 300,
                     child: (allhistoricalData['message']!=null)
                         ? Center(child: Text("No Data for this country"))
                         : charts.TimeSeriesChart(
                             linebar,
-                            animate: true,
-                            animationDuration: Duration(seconds: 1),
+                            // animate: true,
+                            // animationDuration: Duration(seconds: 1),
                           ),
                   )
           ],

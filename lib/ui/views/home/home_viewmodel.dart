@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'package:covid_19/app/locator.dart';
 import 'package:covid_19/app/router.gr.dart';
 import 'package:flutter/material.dart';
@@ -52,10 +51,6 @@ class HomeViewModel extends BaseViewModel {
   Map _allhistoricalData;
   Map get allhistoricalData => _allhistoricalData;
 
-
-
-  
-
   void showHide() async {
     if (_height == 310) {
       _height = 90;
@@ -71,12 +66,7 @@ class HomeViewModel extends BaseViewModel {
 
   void setcountry(String country) {
     _country = country;
-    _worldData = null;
-    _linebar = null;
-    _allhistoricalData = null;
     notifyListeners();
-    // fetchcountryData();
-    // notifyListeners();
   }
 
   addcoma(int number) {
@@ -111,6 +101,7 @@ class HomeViewModel extends BaseViewModel {
     } catch (e) {
       print(e);
     }
+
     // notifyListeners();
     // fetchHistoricalDatacountries();
     return _worldData;

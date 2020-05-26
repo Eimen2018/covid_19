@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'dart:io';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:covid_19/enums/connectivity_status.dart';
 import 'package:covid_19/ui/views/home/home_viewmodel.dart';
@@ -79,9 +77,7 @@ class _HomeViewState extends State<HomeView> {
                       connectionStatus == null)
                   ? Center(
                       child: Lottie.asset(
-                        'assets/noInternet.json',
-                        width: 300,
-                        height: 300,
+                        'assets/networkLost.json',
                         fit: BoxFit.fill,
                       ),
                     )
@@ -282,9 +278,7 @@ class _HomeViewState extends State<HomeView> {
                                         ? model.fetchWorldData()
                                         : model.fetchcountryData(),
                                     builder: (context, snapshot) {
-                                      // if (!snapshot.hasData)
-                                      //   return CupertinoActivityIndicator();
-                                       if (model.worldData == null)
+                                      if (!snapshot.hasData)
                                         return CupertinoActivityIndicator();
                                       return Column(
                                         children: <Widget>[
