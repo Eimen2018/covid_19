@@ -5,10 +5,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Recent extends StatefulWidget {
   final SharedPreferences prefs;
   final Function setCountry;
+  final Function updateData;
   const Recent({
     this.prefs,
     Key key,
     this.setCountry,
+    this.updateData,
   }) : super(key: key);
 
   @override
@@ -44,6 +46,7 @@ class _RecentState extends State<Recent> {
                   onTap: () {
                     widget.setCountry(
                         widget.prefs.getStringList('country')[index]);
+                    widget.updateData();
                   },
                   child: Container(
                     margin: EdgeInsets.all(10),

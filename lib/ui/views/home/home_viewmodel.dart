@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:covid_19/app/locator.dart';
 import 'package:covid_19/app/router.gr.dart';
+import 'package:covid_19/services/api.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:stacked/stacked.dart';
@@ -51,6 +52,19 @@ class HomeViewModel extends BaseViewModel {
   Map _allhistoricalData;
   Map get allhistoricalData => _allhistoricalData;
 
+  int _pageIndicator = 0;
+  int get pageIndicator => _pageIndicator;
+  int _pageIndicator2 = 0;
+  int get pageIndicator2 => _pageIndicator2;
+
+changePageindicator(int current,int slider){
+  if(slider==1)
+  _pageIndicator = current;
+  if(slider==2)
+  _pageIndicator2 = current;
+  notifyListeners();
+}
+
   void showHide() async {
     if (_height == 310) {
       _height = 90;
@@ -66,6 +80,9 @@ class HomeViewModel extends BaseViewModel {
 
   void setcountry(String country) {
     _country = country;
+    _worldData = null;
+    _linebar = null;
+    _allhistoricalData = null;
     notifyListeners();
   }
 
@@ -85,9 +102,12 @@ class HomeViewModel extends BaseViewModel {
     } catch (e) {
       print(e);
     }
-    // notifyListeners();
-    return _worldData;
+    notifyListeners();
+    fetchMostAffected();
+    // return _worldData;
   }
+
+  // Future<Map> fetchWorldData() => locator<Api>().getData();
 
   fetchcountryData() async {
     // _allhistoricalData = null;
@@ -102,9 +122,9 @@ class HomeViewModel extends BaseViewModel {
       print(e);
     }
 
-    // notifyListeners();
-    // fetchHistoricalDatacountries();
-    return _worldData;
+    notifyListeners();
+    fetchHistoricalDatacountries();
+    // return _worldData;
   }
 
   fetchMostAffected() async {
@@ -118,7 +138,8 @@ class HomeViewModel extends BaseViewModel {
     } catch (e) {
       print(e);
     }
-    return _mostAffected;
+    notifyListeners();
+    // return _mostAffected;
   }
 
   fetchMostAffectedCases() async {
@@ -132,7 +153,8 @@ class HomeViewModel extends BaseViewModel {
     } catch (e) {
       print(e);
     }
-    return _mostAffectedCases;
+    notifyListeners();
+    // return _mostAffectedCases;
   }
 
   fetchAllcountries() async {
@@ -150,34 +172,39 @@ class HomeViewModel extends BaseViewModel {
     try {
       http.Response response = await http
           .get('https://disease.sh/v2/historical/' + _country + '?lastdays=60');
-      _allhistoricalData = json.decode(response.body);
-      _linebar = new List<charts.Series<TimeSeriesSales, DateTime>>();
-      _linebar.add(charts.Series(
-        colorFn: (__, _) => charts.ColorUtil.fromDartColor(Colors.orange),
-        id: 'cases',
-        domainFn: (TimeSeriesSales sales, _) => sales.time,
-        measureFn: (TimeSeriesSales sales, _) => sales.sales,
-        data: changedata(_allhistoricalData['timeline']['cases']),
-      ));
-      _linebar.add(charts.Series(
-        colorFn: (__, _) => charts.ColorUtil.fromDartColor(Colors.red),
-        id: 'deaths',
-        domainFn: (TimeSeriesSales sales, _) => sales.time,
-        measureFn: (TimeSeriesSales sales, _) => sales.sales,
-        data: changedata(_allhistoricalData['timeline']['deaths']),
-      ));
-      _linebar.add(charts.Series(
-        colorFn: (__, _) => charts.ColorUtil.fromDartColor(Colors.green),
-        id: 'recovered',
-        domainFn: (TimeSeriesSales sales, _) => sales.time,
-        measureFn: (TimeSeriesSales sales, _) => sales.sales,
-        data: changedata(_allhistoricalData['timeline']['recovered']),
-      ));
+      if (response.statusCode != 404) {
+        _allhistoricalData = json.decode(response.body);
+        _linebar = new List<charts.Series<TimeSeriesSales, DateTime>>();
+        _linebar.add(charts.Series(
+          colorFn: (__, _) => charts.ColorUtil.fromDartColor(Colors.orange),
+          id: 'cases',
+          domainFn: (TimeSeriesSales sales, _) => sales.time,
+          measureFn: (TimeSeriesSales sales, _) => sales.sales,
+          data: changedata(_allhistoricalData['timeline']['cases']),
+        ));
+        _linebar.add(charts.Series(
+          colorFn: (__, _) => charts.ColorUtil.fromDartColor(Colors.red),
+          id: 'deaths',
+          domainFn: (TimeSeriesSales sales, _) => sales.time,
+          measureFn: (TimeSeriesSales sales, _) => sales.sales,
+          data: changedata(_allhistoricalData['timeline']['deaths']),
+        ));
+        _linebar.add(charts.Series(
+          colorFn: (__, _) => charts.ColorUtil.fromDartColor(Colors.green),
+          id: 'recovered',
+          domainFn: (TimeSeriesSales sales, _) => sales.time,
+          measureFn: (TimeSeriesSales sales, _) => sales.sales,
+          data: changedata(_allhistoricalData['timeline']['recovered']),
+        ));
+      } else {
+        _allhistoricalData = {"message": "No Data"};
+        _linebar = new List<charts.Series<TimeSeriesSales, DateTime>>();
+      }
     } catch (e) {
       print(e);
     }
-    // notifyListeners();
-    return _allhistoricalData;
+    notifyListeners();
+    // return _allhistoricalData;
   }
 
   List<TimeSeriesSales> changedata(Map<dynamic, dynamic> data) {

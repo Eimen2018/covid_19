@@ -54,7 +54,7 @@ class Search extends SearchDelegate {
               padding: EdgeInsets.all(10),
               decoration: BoxDecoration(
                   color: Theme.of(context).brightness == Brightness.light
-                      ? Colors.white
+                      ? Colors.black12
                       : Colors.blueGrey[900],
                   borderRadius: BorderRadius.circular(5)),
               child: Image.network(
@@ -62,6 +62,22 @@ class Search extends SearchDelegate {
                 height: 30,
                 width: 50,
                 fit: BoxFit.fill,
+                errorBuilder: (BuildContext context, Object exception,
+                    StackTrace stackTrace) {
+                  return Icon(Icons.error);
+                },
+                loadingBuilder: (BuildContext context, Widget child,
+                    ImageChunkEvent loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                              loadingProgress.expectedTotalBytes
+                          : null,
+                    ),
+                  );
+                },
               ),
             ),
             title: Text(suggestionList[index]['country'].toString()),
@@ -100,6 +116,18 @@ class Search extends SearchDelegate {
                 height: 30,
                 width: 50,
                 fit: BoxFit.fill,
+                loadingBuilder: (BuildContext context, Widget child,
+                    ImageChunkEvent loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                              loadingProgress.expectedTotalBytes
+                          : null,
+                    ),
+                  );
+                },
               ),
             ),
             title: Text(suggestionList[index]['country'].toString()),
