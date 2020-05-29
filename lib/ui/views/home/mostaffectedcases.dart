@@ -6,16 +6,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:stacked_hooks/stacked_hooks.dart';
 
-class MostAffectedCases extends HookViewModelWidget<HomeViewModel>{
-   MostAffectedCases({
+class MostAffectedCases extends HookViewModelWidget<HomeViewModel> {
+  MostAffectedCases({
     Key key,
-    
-  }) : super(key: key,reactive:true);
-
-  
+  }) : super(key: key, reactive: true);
 
   @override
-  Widget buildViewModelWidget(BuildContext context,HomeViewModel model) {
+  Widget buildViewModelWidget(BuildContext context, HomeViewModel model) {
     return Column(
       children: <Widget>[
         CarouselSlider(
@@ -24,100 +21,71 @@ class MostAffectedCases extends HookViewModelWidget<HomeViewModel>{
               aspectRatio: 1.0,
               viewportFraction: 1.2,
               initialPage: 0,
-              scrollDirection:
-                  Axis.horizontal,
+              scrollDirection: Axis.horizontal,
               enableInfiniteScroll: false,
               onPageChanged: (index, reason) {
-               model.changePageindicator(index, 2);
+                model.changePageindicator(index, 2);
               }),
-          items: (model.mostAffectedCases ==
-                  null)
+          items: (model.mostAffectedCases == null)
               ? [
                   Container(
-                      width: MediaQuery.of(
-                              context)
-                          .size
-                          .width,
-                      padding:
-                          EdgeInsets.all(20),
-                      decoration:
-                          BoxDecoration(
-                        borderRadius:
-                            BorderRadius
-                                .circular(20),
+                      width: MediaQuery.of(context).size.width,
+                      padding: EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            offset:
-                                Offset(0, 4),
+                            offset: Offset(0, 4),
                             blurRadius: 30,
-                            color:
-                                kShadowColor,
+                            color: kShadowColor,
                           ),
                         ],
                       ),
-                      child:
-                          CupertinoActivityIndicator())
+                      child: CupertinoActivityIndicator())
                 ]
               : [
                   MostAffected(
-                    type:
-                        "Highest Case By\nCountry",
+                    type: "Highest Case By\nCountry",
                     name: "Cases",
                     color: Colors.green,
-                    countryData: model
-                        .mostAffectedCases,
-                    setCountry:
-                        model.setcountry,
-                    updateData: model
-                        .fetchcountryData,
+                    countryData: model.mostAffectedCases,
+                    setCountry: model.setcountry,
+                    updateData: model.fetchcountryData,
                     date: 'Today',
                   ),
                   MostAffected(
-                    type:
-                        "Highest Case By\nCountry",
+                    type: "Highest Case By\nCountry",
                     name: "Cases",
                     color: Colors.green,
-                    countryData: model
-                        .mostAffectedCasesYesterday,
-                    setCountry:
-                        model.setcountry,
-                    updateData: model
-                        .fetchcountryData,
+                    countryData: model.mostAffectedCasesYesterday,
+                    setCountry: model.setcountry,
+                    updateData: model.fetchcountryData,
                     date: 'Yesterday',
                   ),
                 ].map((i) {
                   return Builder(
-                    builder: (BuildContext
-                        context) {
+                    builder: (BuildContext context) {
                       return i;
                     },
                   );
                 }).toList(),
         ),
         Row(
-          mainAxisAlignment:
-              MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [1, 2].map((url) {
             int index = [1, 2].indexOf(url);
             return Container(
               width: 8.0,
               height: 8.0,
-              margin: EdgeInsets.symmetric(
-                  horizontal: 2.0),
+              margin: EdgeInsets.symmetric(horizontal: 2.0),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: model.pageIndicator2 == index
-                    ? Theme.of(context)
-                                .brightness ==
-                            Brightness.light
-                        ? Color.fromRGBO(
-                            0, 0, 0, 0.9)
+                    ? Theme.of(context).brightness == Brightness.light
+                        ? Color.fromRGBO(0, 0, 0, 0.9)
                         : Colors.white
-                    : Theme.of(context)
-                                .brightness ==
-                            Brightness.light
-                        ? Color.fromRGBO(
-                            0, 0, 0, 0.4)
+                    : Theme.of(context).brightness == Brightness.light
+                        ? Color.fromRGBO(0, 0, 0, 0.4)
                         : Colors.grey,
               ),
             );
@@ -127,4 +95,3 @@ class MostAffectedCases extends HookViewModelWidget<HomeViewModel>{
     );
   }
 }
-

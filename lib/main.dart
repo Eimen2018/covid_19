@@ -3,6 +3,7 @@ import 'package:covid_19/app/router.gr.dart';
 import 'package:covid_19/constant.dart';
 import 'package:covid_19/enums/connectivity_status.dart';
 import 'package:covid_19/services/connectivity_services.dart';
+import 'package:covid_19/services/notification_service.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,6 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);

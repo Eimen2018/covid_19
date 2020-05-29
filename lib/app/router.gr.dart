@@ -9,13 +9,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:covid_19/ui/views/home/home_view.dart';
 import 'package:covid_19/ui/views/info/info_view.dart';
+import 'package:covid_19/ui/views/setting/setting_view.dart';
 
 abstract class Routes {
   static const homeView = '/';
   static const infoViewRoute = '/info-view-route';
+  static const setting = '/setting';
   static const all = {
     homeView,
     infoViewRoute,
+    setting,
   };
 }
 
@@ -38,6 +41,11 @@ class Router extends RouterBase {
       case Routes.infoViewRoute:
         return MaterialPageRoute<dynamic>(
           builder: (context) => InfoView(),
+          settings: settings,
+        );
+      case Routes.setting:
+        return MaterialPageRoute<dynamic>(
+          builder: (context) => SettingView(),
           settings: settings,
         );
       default:

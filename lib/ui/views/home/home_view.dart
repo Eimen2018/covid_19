@@ -1,17 +1,15 @@
 import 'dart:async';
-
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:covid_19/app/locator.dart';
 import 'package:covid_19/enums/connectivity_status.dart';
+import 'package:covid_19/services/notification_service.dart';
 import 'package:covid_19/ui/views/home/home_viewmodel.dart';
 import 'package:covid_19/ui/views/home/mostaffectedcases.dart';
 import 'package:covid_19/ui/views/home/mostaffecteddeaths.dart';
 import 'package:covid_19/ui/views/home/worldData.dart';
 import 'package:covid_19/ui/views/info/info_view.dart';
+import 'package:covid_19/ui/views/setting/setting_view.dart';
 import 'package:covid_19/widgets/analysisgraph.dart';
-import 'package:covid_19/widgets/counter.dart';
-import 'package:covid_19/widgets/moreinfo.dart';
-import 'package:covid_19/widgets/mostaffected.dart';
 import 'package:covid_19/widgets/my_header.dart';
 import 'package:covid_19/widgets/recent.dart';
 import 'package:covid_19/widgets/search.dart';
@@ -22,7 +20,6 @@ import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stacked/stacked.dart';
-import 'package:stacked_hooks/stacked_hooks.dart';
 import 'package:time_formatter/time_formatter.dart';
 import '../../../constant.dart';
 
@@ -50,26 +47,19 @@ class _HomeViewState extends State<HomeView> {
 
   SharedPreferences prefs;
   StreamSubscription<ConnectivityResult> subscription;
+  // NotificationService notificationService = locator<NotificationService>();
 
   @override
   void initState() {
     super.initState();
     controller.addListener(onScroll);
+    // notificationService.initialize();
   }
-
-  @override
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
-
-  int _current2 = 0;
 
   @override
   Widget build(BuildContext context) {
     var connectionStatus = Provider.of<ConnectivityStatus>(context);
     return ViewModelBuilder<HomeViewModel>.reactive(
-      // createNewModelOnInsert: true,
       onModelReady: (model) async {
         prefs = await SharedPreferences.getInstance();
         subscription = Connectivity()
@@ -87,6 +77,7 @@ class _HomeViewState extends State<HomeView> {
       viewModelBuilder: () => HomeViewModel(),
       builder: (context, model, child) => Scaffold(
         endDrawer: InfoView(),
+        drawer: SettingView(),
         body: SingleChildScrollView(
           controller: controller,
           child: Column(
@@ -110,28 +101,30 @@ class _HomeViewState extends State<HomeView> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          Container(
-                            padding: EdgeInsets.all(15),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Colors.blueGrey[900]
-                                  : Colors.white,
-                              borderRadius: BorderRadius.circular(7),
-                              border: Border.all(
-                                color: Color(0xFFE5E5E5),
+                          GestureDetector(
+                            onLongPress: () {
+                              model.setcountry('Global');
+                              prefs.clear();
+                              model.fetchWorldData();
+                            },
+                            onTap: () {
+                              model.setcountry('Global');
+                              model.fetchWorldData();
+                              // notificationService
+                              //     .showNotification(model.country);
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(15),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.blueGrey[900]
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(7),
+                                border: Border.all(
+                                  color: Color(0xFFE5E5E5),
+                                ),
                               ),
-                            ),
-                            child: GestureDetector(
-                              onLongPress: () {
-                                model.setcountry('Global');
-                                prefs.clear();
-                                model.fetchWorldData();
-                              },
-                              onTap: () {
-                                model.setcountry('Global');
-                                model.fetchWorldData();
-                              },
                               child: Image.asset(
                                 "assets/icons/globe.png",
                                 width: 20,
@@ -220,12 +213,14 @@ class _HomeViewState extends State<HomeView> {
                           ),
                         ],
                       ),
-                      (prefs.getStringList('country') != null)
-                          ? Recent(
-                              prefs: prefs,
-                              setCountry: model.setcountry,
-                              updateData: model.fetchcountryData)
-                          : SizedBox.shrink(),
+                      (prefs != null)
+                          ? (prefs.getStringList('country') != null)
+                              ? Recent(
+                                  prefs: prefs,
+                                  setCountry: model.setcountry,
+                                  updateData: model.fetchcountryData)
+                              : SizedBox.shrink()
+                          : CupertinoActivityIndicator(),
                       SizedBox(height: 20),
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 20),
@@ -287,7 +282,7 @@ class _HomeViewState extends State<HomeView> {
                                     children: <Widget>[
                                       MostAffectedDeaths(),
                                       SizedBox(
-                                        height: 10,
+                                        height: 20,
                                       ),
                                       MostAffectedCases(),
                                     ],

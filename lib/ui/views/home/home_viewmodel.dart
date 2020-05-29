@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:covid_19/app/locator.dart';
 import 'package:covid_19/app/router.gr.dart';
-import 'package:covid_19/services/api.dart';
+import 'package:covid_19/services/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:stacked/stacked.dart';
@@ -12,6 +12,8 @@ import 'package:charts_flutter/flutter.dart' as charts;
 
 class HomeViewModel extends BaseViewModel {
   final NavigationService _navigationService = locator<NavigationService>();
+ 
+
 
   String _country = 'Global';
   String get country => _country;
@@ -32,7 +34,7 @@ class HomeViewModel extends BaseViewModel {
   List get mostAffectedYesterday => _mostAffectedYesterday;
 
   List _mostAffectedCases;
-  List get mostAffectedCases => _mostAffected;
+  List get mostAffectedCases => _mostAffectedCases;
 
   List _mostAffectedCasesYesterday;
   List get mostAffectedCasesYesterday => _mostAffectedCasesYesterday;
@@ -57,13 +59,11 @@ class HomeViewModel extends BaseViewModel {
   int _pageIndicator2 = 0;
   int get pageIndicator2 => _pageIndicator2;
 
-changePageindicator(int current,int slider){
-  if(slider==1)
-  _pageIndicator = current;
-  if(slider==2)
-  _pageIndicator2 = current;
-  notifyListeners();
-}
+  changePageindicator(int current, int slider) {
+    if (slider == 1) _pageIndicator = current;
+    if (slider == 2) _pageIndicator2 = current;
+    notifyListeners();
+  }
 
   void showHide() async {
     if (_height == 310) {
@@ -101,6 +101,7 @@ changePageindicator(int current,int slider){
       _timeStamp = worldData['updated'];
     } catch (e) {
       print(e);
+      fetchWorldData();
     }
     notifyListeners();
     fetchMostAffected();
@@ -120,6 +121,7 @@ changePageindicator(int current,int slider){
       _timeStamp = worldData['updated'];
     } catch (e) {
       print(e);
+      fetchcountryData();
     }
 
     notifyListeners();
@@ -137,6 +139,7 @@ changePageindicator(int current,int slider){
       _mostAffectedYesterday = json.decode(response.body);
     } catch (e) {
       print(e);
+      fetchMostAffected();
     }
     notifyListeners();
     // return _mostAffected;
@@ -152,6 +155,7 @@ changePageindicator(int current,int slider){
       _mostAffectedCasesYesterday = json.decode(response.body);
     } catch (e) {
       print(e);
+      fetchMostAffectedCases();
     }
     notifyListeners();
     // return _mostAffectedCases;
@@ -164,8 +168,9 @@ changePageindicator(int current,int slider){
       _countryData = json.decode(response.body);
     } catch (e) {
       print(e);
+      fetchAllcountries();
     }
-    return _countryData;
+    notifyListeners();
   }
 
   fetchHistoricalDatacountries() async {
@@ -202,10 +207,12 @@ changePageindicator(int current,int slider){
       }
     } catch (e) {
       print(e);
+      fetchHistoricalDatacountries();
     }
     notifyListeners();
-    // return _allhistoricalData;
   }
+
+
 
   List<TimeSeriesSales> changedata(Map<dynamic, dynamic> data) {
     List<TimeSeriesSales> dataD = [];
