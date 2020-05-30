@@ -1,3 +1,4 @@
+import 'package:covid_19/services/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -6,9 +7,16 @@ class SettingSearch extends SearchDelegate {
   final List countryList;
   final SharedPreferences prefs;
   final Function getselected;
-  SettingSearch({this.countryList, this.prefs,this.getselected});
-
-
+  final NotificationService notificationService;
+  final Function getnotificationStrings;
+  final Function checkSharedpreference;
+  SettingSearch(
+      {this.getnotificationStrings,
+      this.checkSharedpreference,
+      this.notificationService,
+      this.countryList,
+      this.prefs,
+      this.getselected});
 
   @override
   List<Widget> buildActions(BuildContext context) {
@@ -71,7 +79,14 @@ class SettingSearch extends SearchDelegate {
             ),
             title: Text(suggestionList[index]['country'].toString()),
             onTap: () async {
-              getselected(suggestionList[index]['country'].toString(),prefs);
+              getselected(suggestionList[index]['country'].toString(), prefs);
+              notificationService.cancelNotification();
+              notificationService.getnotificationeveryday(
+                  await getnotificationStrings(prefs),
+                  (checkSharedpreference(prefs))
+                      ? "Set Notification"
+                      : "Today Reported Cases");
+              print("Notification Update...");
               Navigator.pop(context);
             },
           );
@@ -119,7 +134,14 @@ class SettingSearch extends SearchDelegate {
             ),
             title: Text(suggestionList[index]['country'].toString()),
             onTap: () async {
-              getselected(suggestionList[index]['country'].toString(),prefs);
+              getselected(suggestionList[index]['country'].toString(), prefs);
+              notificationService.cancelNotification();
+              notificationService.getnotificationeveryday(
+                  await getnotificationStrings(prefs),
+                  (checkSharedpreference(prefs))
+                      ? "Set Notification"
+                      : "Today Reported Cases");
+              print("Notification Update...");
               Navigator.pop(context);
             },
           );

@@ -47,13 +47,13 @@ class _HomeViewState extends State<HomeView> {
 
   SharedPreferences prefs;
   StreamSubscription<ConnectivityResult> subscription;
-  // NotificationService notificationService = locator<NotificationService>();
+  NotificationService notificationService = locator<NotificationService>();
 
   @override
   void initState() {
     super.initState();
     controller.addListener(onScroll);
-    // notificationService.initialize();
+    notificationService.initialize();
   }
 
   @override
@@ -77,7 +77,7 @@ class _HomeViewState extends State<HomeView> {
       viewModelBuilder: () => HomeViewModel(),
       builder: (context, model, child) => Scaffold(
         endDrawer: InfoView(),
-        drawer: SettingView(),
+        drawer: SettingView(notificationService: notificationService,),
         body: SingleChildScrollView(
           controller: controller,
           child: Column(
@@ -110,8 +110,8 @@ class _HomeViewState extends State<HomeView> {
                             onTap: () {
                               model.setcountry('Global');
                               model.fetchWorldData();
-                              // notificationService
-                              //     .showNotification(model.country);
+                              notificationService
+                                  .showNotification(model.country);
                             },
                             child: Container(
                               padding: EdgeInsets.all(15),

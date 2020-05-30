@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:covid_19/app/locator.dart';
 import 'package:covid_19/app/router.gr.dart';
-import 'package:covid_19/services/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:stacked/stacked.dart';
@@ -58,6 +57,8 @@ class HomeViewModel extends BaseViewModel {
   int get pageIndicator => _pageIndicator;
   int _pageIndicator2 = 0;
   int get pageIndicator2 => _pageIndicator2;
+  List<String> _notificatioinCases;
+  List<String> get notificationCases => _notificatioinCases;
 
   changePageindicator(int current, int slider) {
     if (slider == 1) _pageIndicator = current;

@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:covid_19/constant.dart';
+import 'package:covid_19/services/notification_service.dart';
 import 'package:covid_19/ui/views/setting/setting_viewmodel.dart';
 import 'package:covid_19/widgets/my_header.dart';
-import 'package:covid_19/widgets/settingsearch.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +12,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stacked/stacked.dart';
 
 class SettingView extends StatefulWidget {
+  final NotificationService notificationService;
+  const SettingView({
+    Key key,
+    this.notificationService,
+  }) : super(key: key);
   @override
   _SettingViewState createState() => _SettingViewState();
 }
@@ -47,6 +52,8 @@ class _SettingViewState extends State<SettingView> {
       onModelReady: (model) async {
         prefs = await SharedPreferences.getInstance();
         model.fetchAllcountries();
+        if (prefs.getBool("isSwitched") != null)
+          model.isSwitched = prefs.getBool("isSwitched");
       },
       viewModelBuilder: () => SettingViewModel(),
       builder: (context, model, child) => Scaffold(
@@ -137,8 +144,21 @@ class _SettingViewState extends State<SettingView> {
                               ),
                               Switch(
                                 value: model.isSwitched,
-                                onChanged: (value) {
-                                  model.isSwitched = value;
+                                onChanged: (value) async {
+                                  model.changeisSwitched(value, prefs);
+                                  if (value) {
+                                    widget.notificationService
+                                        .getnotificationeveryday(
+                                            await model
+                                                .getnotificationStrings(prefs),
+                                            (model.checkSharedpreference(prefs))
+                                                ? "Set Notification"
+                                                : "Today Reported Cases");
+                                    print("Notification Set...");
+                                  } else {
+                                    widget.notificationService
+                                        .cancelNotification();
+                                  }
                                 },
                                 activeTrackColor: Color(0xFF3383CD),
                                 activeColor: Color(0xFF11249F),
@@ -190,7 +210,10 @@ class _SettingViewState extends State<SettingView> {
                                                         ? null
                                                         : () {
                                                             model.searchPage(
-                                                                context, prefs);
+                                                                context,
+                                                                prefs,
+                                                                widget
+                                                                    .notificationService);
                                                             Future.delayed(
                                                                 Duration(
                                                                     milliseconds:
@@ -257,7 +280,10 @@ class _SettingViewState extends State<SettingView> {
                                                         ? null
                                                         : () {
                                                             model.searchPage(
-                                                                context, prefs);
+                                                                context,
+                                                                prefs,
+                                                                widget
+                                                                    .notificationService);
                                                             Future.delayed(
                                                                 Duration(
                                                                     milliseconds:
@@ -337,12 +363,25 @@ class _SettingViewState extends State<SettingView> {
                                                             index]),
                                                         // SizedBox(width: 5),
                                                         GestureDetector(
-                                                          onTap: () {
+                                                          onTap: () async {
                                                             model.deleteNotificationCountry(
                                                                 prefs.getStringList(
                                                                         'notificationcountry')[
                                                                     index],
                                                                 prefs);
+                                                            widget
+                                                                .notificationService
+                                                                .cancelNotification();
+                                                            widget.notificationService.getnotificationeveryday(
+                                                                await model
+                                                                    .getnotificationStrings(
+                                                                        prefs),
+                                                                (model.checkSharedpreference(
+                                                                        prefs))
+                                                                    ? "Set Notification"
+                                                                    : "Today Reported Cases");
+                                                            print(
+                                                                "Notification Set...");
                                                           },
                                                           child: Icon(
                                                             Icons.close,

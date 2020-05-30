@@ -1,15 +1,10 @@
-import 'package:covid_19/app/locator.dart';
-import 'package:covid_19/app/router.gr.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:injectable/injectable.dart';
-import 'package:stacked_services/stacked_services.dart';
 
 @lazySingleton
 class NotificationService {
-  final NavigationService _navigationService = locator<NavigationService>();
-
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
   var initializationSettingsIOS;
@@ -33,25 +28,25 @@ class NotificationService {
     // _navigationService.navigateTo('/');
   }
 
-  getnotificationeveryday() async {
-    var time = Time(10, 0, 0);
+  getnotificationeveryday(String cases, String title) async {
+    var time = Time(14, 0, 0);
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
         'repeatDailyAtTime channel id',
-        'repeatDailyAtTime channel name',
+        'Daily',
         'repeatDailyAtTime description');
     var iOSPlatformChannelSpecifics = IOSNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
     await flutterLocalNotificationsPlugin.showDailyAtTime(
-        0,
-        'show daily title',
-        'Daily notification shown at approximately ${_toTwoDigitString(time.hour)}:${_toTwoDigitString(time.minute)}:${_toTwoDigitString(time.second)}',
-        time,
-        platformChannelSpecifics);
+        0, title, cases, time, platformChannelSpecifics);
   }
 
-  String _toTwoDigitString(int value) {
-    return value.toString().padLeft(2, '0');
+  // String _toTwoDigitString(int value) {
+  //   return value.toString().padLeft(2, '0');
+  // }
+
+  cancelNotification() async {
+    await flutterLocalNotificationsPlugin.cancelAll();
   }
 
   showNotification(String country) async {

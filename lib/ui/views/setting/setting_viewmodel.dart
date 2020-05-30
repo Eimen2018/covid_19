@@ -1,18 +1,22 @@
 import 'dart:convert';
-import 'package:covid_19/app/locator.dart';
 import 'package:covid_19/services/notification_service.dart';
 import 'package:covid_19/widgets/settingsearch.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stacked/stacked.dart';
 
 class SettingViewModel extends BaseViewModel {
-  bool _isSwitched = true;
+  bool _isSwitched = false;
   bool get isSwitched => _isSwitched;
   set isSwitched(bool value) {
     _isSwitched = value;
+    notifyListeners();
+  }
+
+  changeisSwitched(bool value, SharedPreferences prefs) {
+    _isSwitched = value;
+    prefs.setBool("isSwitched", value);
     notifyListeners();
   }
 
@@ -73,11 +77,38 @@ class SettingViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  Future searchPage(BuildContext context, SharedPreferences prefs) {
+  Future searchPage(BuildContext context, SharedPreferences prefs,
+      NotificationService notificationService) {
     return showSearch(
         context: context,
         delegate: SettingSearch(
-            countryList: countryData, prefs: prefs, getselected: getselected));
+            countryList: countryData,
+            prefs: prefs,
+            getselected: getselected,
+            notificationService: notificationService,
+            getnotificationStrings: getnotificationStrings,
+            checkSharedpreference: checkSharedpreference));
+  }
+
+  getnotificationStrings(SharedPreferences prefs) async {
+    List a;
+    String b = "";
+    if (checkSharedpreference(prefs)) {
+      return "Select A Country in Settings to Recieve Today Case Notification";
+    }
+    try {
+      http.Response response =
+          await http.get('https://disease.sh/v2/countries');
+      a = json.decode(response.body);
+      prefs.getStringList('notificationcountry').forEach((element) {
+        var c = a.firstWhere((e) => (e['country'].toString() == element));
+        b += element + ": " + c['todayCases'].toString() + " \n";
+      });
+    } catch (e) {
+      print(e);
+      getnotificationStrings(prefs);
+    }
+    return b;
   }
 }
 
