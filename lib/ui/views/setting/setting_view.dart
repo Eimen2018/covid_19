@@ -139,7 +139,7 @@ class _SettingViewState extends State<SettingView> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
                               Text(
-                                "Show Notification When a Specific \nCountry's Data Change",
+                                "Show Notification When a Specific \nCountry's Data @14:00",
                                 style: kHeadingTextStyle.copyWith(fontSize: 14),
                               ),
                               Switch(
