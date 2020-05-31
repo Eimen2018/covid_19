@@ -80,13 +80,13 @@ class SettingSearch extends SearchDelegate {
             title: Text(suggestionList[index]['country'].toString()),
             onTap: () async {
               getselected(suggestionList[index]['country'].toString(), prefs);
-              notificationService.cancelNotification();
-              notificationService.getnotificationeveryday(
-                  await getnotificationStrings(prefs),
-                  (checkSharedpreference(prefs))
-                      ? "Set Notification"
-                      : "Today Reported Cases");
-              print("Notification Update...");
+              // notificationService.cancelNotification();
+              // notificationService.getnotificationeveryday(
+              //     await getnotificationStrings(prefs),
+              //     (checkSharedpreference(prefs))
+              //         ? "Set Notification"
+              //         : "Today Reported Cases");
+              // print("Notification Update...");
               Navigator.pop(context);
             },
           );
@@ -135,13 +135,13 @@ class SettingSearch extends SearchDelegate {
             title: Text(suggestionList[index]['country'].toString()),
             onTap: () async {
               getselected(suggestionList[index]['country'].toString(), prefs);
-              notificationService.cancelNotification();
-              notificationService.getnotificationeveryday(
-                  await getnotificationStrings(prefs),
-                  (checkSharedpreference(prefs))
-                      ? "Set Notification"
-                      : "Today Reported Cases");
-              print("Notification Update...");
+              // notificationService.cancelNotification();
+              // notificationService.getnotificationeveryday(
+              //     await getnotificationStrings(prefs),
+              //     (checkSharedpreference(prefs))
+              //         ? "Set Notification"
+              //         : "Today Reported Cases");
+              // print("Notification Update...");
               Navigator.pop(context);
             },
           );

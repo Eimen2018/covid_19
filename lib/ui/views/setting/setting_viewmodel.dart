@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:covid_19/services/notification_service.dart';
 import 'package:covid_19/widgets/settingsearch.dart';
@@ -7,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stacked/stacked.dart';
 
 class SettingViewModel extends BaseViewModel {
+  StreamController<String> controller = StreamController<String>();
   bool _isSwitched = false;
   bool get isSwitched => _isSwitched;
   set isSwitched(bool value) {
@@ -18,6 +20,20 @@ class SettingViewModel extends BaseViewModel {
     _isSwitched = value;
     prefs.setBool("isSwitched", value);
     notifyListeners();
+  }
+
+  String xxx = "";
+
+  Stream<String> getCountrydata(SharedPreferences prefs) async* {
+    String b = "";
+    while (true) {
+      await Future.delayed(Duration(seconds: 4));
+      b = await getnotificationStrings(prefs);
+      if (xxx != b) {
+        xxx = await getnotificationStrings(prefs);
+        yield b;
+      }
+    }
   }
 
   List<Color> borderColors = [
@@ -108,6 +124,7 @@ class SettingViewModel extends BaseViewModel {
       print(e);
       getnotificationStrings(prefs);
     }
+
     return b;
   }
 }

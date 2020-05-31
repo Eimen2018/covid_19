@@ -11,8 +11,6 @@ import 'package:charts_flutter/flutter.dart' as charts;
 
 class HomeViewModel extends BaseViewModel {
   final NavigationService _navigationService = locator<NavigationService>();
- 
-
 
   String _country = 'Global';
   String get country => _country;
@@ -59,6 +57,8 @@ class HomeViewModel extends BaseViewModel {
   int get pageIndicator2 => _pageIndicator2;
   List<String> _notificatioinCases;
   List<String> get notificationCases => _notificatioinCases;
+  int trial = 0;
+  Map<String, String> endOfTrial = Map();
 
   changePageindicator(int current, int slider) {
     if (slider == 1) _pageIndicator = current;
@@ -102,7 +102,11 @@ class HomeViewModel extends BaseViewModel {
       _timeStamp = worldData['updated'];
     } catch (e) {
       print(e);
-      fetchWorldData();
+      if (trial < 3) {
+        fetchWorldData();
+        trial++;
+      } else
+        endOfTrial.addAll({"WorldData": "Failed to Load World Data"});
     }
     notifyListeners();
     fetchMostAffected();
@@ -122,7 +126,11 @@ class HomeViewModel extends BaseViewModel {
       _timeStamp = worldData['updated'];
     } catch (e) {
       print(e);
-      fetchcountryData();
+      if (trial < 10) {
+        fetchcountryData();
+        trial++;
+      } else
+        endOfTrial.addAll({"CountryData": "Failed to Load Country Data"});
     }
 
     notifyListeners();
@@ -140,7 +148,12 @@ class HomeViewModel extends BaseViewModel {
       _mostAffectedYesterday = json.decode(response.body);
     } catch (e) {
       print(e);
-      fetchMostAffected();
+      if (trial < 10) {
+        fetchMostAffected();
+        trial++;
+      } else
+        endOfTrial
+            .addAll({"MostAffected": "Failed to Load Most Affected Data"});
     }
     notifyListeners();
     // return _mostAffected;
@@ -156,7 +169,12 @@ class HomeViewModel extends BaseViewModel {
       _mostAffectedCasesYesterday = json.decode(response.body);
     } catch (e) {
       print(e);
-      fetchMostAffectedCases();
+      if (trial < 10) {
+        fetchMostAffectedCases();
+        trial++;
+      } else
+        endOfTrial
+            .addAll({"MostAffected": "Failed to Load Most Affected Data"});
     }
     notifyListeners();
     // return _mostAffectedCases;
@@ -169,7 +187,11 @@ class HomeViewModel extends BaseViewModel {
       _countryData = json.decode(response.body);
     } catch (e) {
       print(e);
-      fetchAllcountries();
+      if (trial < 10) {
+        fetchAllcountries();
+        trial++;
+      } else
+        endOfTrial.addAll({"ListCountries": "Failed to Load Country List"});
     }
     notifyListeners();
   }
@@ -208,12 +230,14 @@ class HomeViewModel extends BaseViewModel {
       }
     } catch (e) {
       print(e);
-      fetchHistoricalDatacountries();
+      if (trial < 10) {
+        fetchHistoricalDatacountries();
+        trial++;
+      } else
+        endOfTrial.addAll({"Historical": "Failed to Load Historical Data"});
     }
     notifyListeners();
   }
-
-
 
   List<TimeSeriesSales> changedata(Map<dynamic, dynamic> data) {
     List<TimeSeriesSales> dataD = [];

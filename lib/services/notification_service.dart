@@ -1,10 +1,13 @@
+import 'package:covid_19/app/locator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:injectable/injectable.dart';
+import 'package:stacked_services/stacked_services.dart';
 
 @lazySingleton
 class NotificationService {
+  // NavigationService _navigationService = locator<NavigationService>();
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
   var initializationSettingsIOS;
@@ -25,7 +28,7 @@ class NotificationService {
     if (payload != null) {
       debugPrint('notification payload: ' + payload);
     }
-    // _navigationService.navigateTo('/');
+    // _navigationService.navigateTo('/setting');
   }
 
   getnotificationeveryday(String cases, String title) async {
@@ -49,16 +52,18 @@ class NotificationService {
     await flutterLocalNotificationsPlugin.cancelAll();
   }
 
-  showNotification(String country) async {
+  showNotification(String cases) async {
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
         'your channel id', 'your channel name', 'your channel description',
         importance: Importance.Max, priority: Priority.High, ticker: 'ticker');
     var iOSPlatformChannelSpecifics = IOSNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-    await flutterLocalNotificationsPlugin.show(
-        0, 'plain title', 'plain body', platformChannelSpecifics,
-        payload: country);
+    if (cases != null || cases != "") {
+      await flutterLocalNotificationsPlugin.show(
+          0, "Today Reported Cases", cases, platformChannelSpecifics,
+          payload: "country");
+    }
   }
 
   Future onDidReceiveLocalNotification(

@@ -44,16 +44,24 @@ class _SettingViewState extends State<SettingView> {
   }
 
   SharedPreferences prefs;
-
+  // Stream stream;
+  StreamSubscription<dynamic> streamSubscription;
   @override
   Widget build(BuildContext context) {
     // var connectionStatus = Provider.of<ConnectivityStatus>(context);
     return ViewModelBuilder<SettingViewModel>.reactive(
       onModelReady: (model) async {
+        // stream = model.controller.stream;
         prefs = await SharedPreferences.getInstance();
         model.fetchAllcountries();
         if (prefs.getBool("isSwitched") != null)
           model.isSwitched = prefs.getBool("isSwitched");
+        if (model.isSwitched) {
+          streamSubscription = model.getCountrydata(prefs).listen((value) {
+            // print('Value from controller: '+value.toString());
+            widget.notificationService.showNotification(value);
+          });
+        }
       },
       viewModelBuilder: () => SettingViewModel(),
       builder: (context, model, child) => Scaffold(
@@ -139,7 +147,7 @@ class _SettingViewState extends State<SettingView> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
                               Text(
-                                "Show Notification When a Specific \nCountry's Data @14:00",
+                                "Show Notification When a Specific \nCountry's Data Change",
                                 style: kHeadingTextStyle.copyWith(fontSize: 14),
                               ),
                               Switch(
@@ -147,17 +155,26 @@ class _SettingViewState extends State<SettingView> {
                                 onChanged: (value) async {
                                   model.changeisSwitched(value, prefs);
                                   if (value) {
-                                    widget.notificationService
-                                        .getnotificationeveryday(
-                                            await model
-                                                .getnotificationStrings(prefs),
-                                            (model.checkSharedpreference(prefs))
-                                                ? "Set Notification"
-                                                : "Today Reported Cases");
+                                    streamSubscription = model
+                                        .getCountrydata(prefs)
+                                        .listen((value) {
+                                      // print('Value from controller: $value');
+                                      widget.notificationService
+                                          .showNotification(value);
+                                    });
+                                    // widget.notificationService
+                                    //     .getnotificationeveryday(
+                                    //         await model
+                                    //             .getnotificationStrings(prefs),
+                                    //         (model.checkSharedpreference(prefs))
+                                    //             ? "Set Notification"
+                                    //             : "Today Reported Cases");
                                     print("Notification Set...");
                                   } else {
-                                    widget.notificationService
-                                        .cancelNotification();
+                                    await streamSubscription.cancel();
+                                    print("Notification Cancelled");
+                                    // widget.notificationService
+                                    //     .cancelNotification();
                                   }
                                 },
                                 activeTrackColor: Color(0xFF3383CD),
@@ -202,38 +219,36 @@ class _SettingViewState extends State<SettingView> {
                                           "Countries to Watch Data Change",
                                         ),
                                         (!model.checkSharedpreference(prefs))
-                                            ? InkWell(
-                                                onTap:
-                                                    (model.checkcountryDataandLength(
-                                                                prefs) ||
-                                                            !model.isSwitched)
-                                                        ? null
-                                                        : () {
-                                                            model.searchPage(
-                                                                context,
-                                                                prefs,
-                                                                widget
-                                                                    .notificationService);
-                                                            Future.delayed(
-                                                                Duration(
-                                                                    milliseconds:
-                                                                        600),
-                                                                () {
-                                                              FlutterStatusbarcolor
-                                                                  .setStatusBarWhiteForeground(
-                                                                      false);
-                                                            });
-                                                          },
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceAround,
-                                                  children: <Widget>[
-                                                    Text(model.getPrefLength(
-                                                            prefs) +
-                                                        "/4"),
-                                                    SizedBox(width: 5),
-                                                    Container(
+                                            ? Row(
+                                                children: <Widget>[
+                                                  Text(model.getPrefLength(
+                                                          prefs) +
+                                                      "/4"),
+                                                  SizedBox(width: 5),
+                                                  InkWell(
+                                                    onTap:
+                                                        (model.checkcountryDataandLength(
+                                                                    prefs) ||
+                                                                !model
+                                                                    .isSwitched)
+                                                            ? null
+                                                            : () {
+                                                                model.searchPage(
+                                                                    context,
+                                                                    prefs,
+                                                                    widget
+                                                                        .notificationService);
+                                                                Future.delayed(
+                                                                    Duration(
+                                                                        milliseconds:
+                                                                            600),
+                                                                    () {
+                                                                  FlutterStatusbarcolor
+                                                                      .setStatusBarWhiteForeground(
+                                                                          false);
+                                                                });
+                                                              },
+                                                    child: Container(
                                                       width: 30,
                                                       height: 30,
                                                       decoration: BoxDecoration(
@@ -258,8 +273,8 @@ class _SettingViewState extends State<SettingView> {
                                                               ? Colors.grey
                                                               : null),
                                                     ),
-                                                  ],
-                                                ),
+                                                  ),
+                                                ],
                                               )
                                             : SizedBox.shrink()
                                       ],
@@ -369,17 +384,18 @@ class _SettingViewState extends State<SettingView> {
                                                                         'notificationcountry')[
                                                                     index],
                                                                 prefs);
-                                                            widget
-                                                                .notificationService
-                                                                .cancelNotification();
-                                                            widget.notificationService.getnotificationeveryday(
-                                                                await model
-                                                                    .getnotificationStrings(
-                                                                        prefs),
-                                                                (model.checkSharedpreference(
-                                                                        prefs))
-                                                                    ? "Set Notification"
-                                                                    : "Today Reported Cases");
+                                                            // widget
+                                                            //     .notificationService
+                                                            //     .cancelNotification();
+                                                            // widget.notificationService.getnotificationeveryday(
+                                                            //     await model
+                                                            //         .getnotificationStrings(
+                                                            //             prefs),
+                                                            //     (model.checkSharedpreference(
+                                                            //             prefs))
+                                                            //         ? "Set Notification"
+                                                            //         : "Today Reported Cases");
+
                                                             print(
                                                                 "Notification Set...");
                                                           },

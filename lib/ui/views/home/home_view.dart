@@ -77,7 +77,9 @@ class _HomeViewState extends State<HomeView> {
       viewModelBuilder: () => HomeViewModel(),
       builder: (context, model, child) => Scaffold(
         endDrawer: InfoView(),
-        drawer: SettingView(notificationService: notificationService,),
+        drawer: SettingView(
+          notificationService: notificationService,
+        ),
         body: SingleChildScrollView(
           controller: controller,
           child: Column(
@@ -110,8 +112,6 @@ class _HomeViewState extends State<HomeView> {
                             onTap: () {
                               model.setcountry('Global');
                               model.fetchWorldData();
-                              notificationService
-                                  .showNotification(model.country);
                             },
                             child: Container(
                               padding: EdgeInsets.all(15),
@@ -275,7 +275,18 @@ class _HomeViewState extends State<HomeView> {
                               ],
                             ),
                             SizedBox(height: 20),
-                            WorldDataView(),
+                            (model.endOfTrial["WorldData"] == null &&
+                                    model.endOfTrial["CountryData"] == null)
+                                ? WorldDataView()
+                                : IconButton(
+                                    icon: Icon(Icons.refresh),
+                                    onPressed: () {
+                                      model.setcountry("Global");
+                                      model.fetchWorldData();
+                                      model.fetchAllcountries();
+                                      model.fetchMostAffected();
+                                      model.fetchMostAffectedCases();
+                                    }),
                             SizedBox(height: 20),
                             (model.country == 'Global')
                                 ? Column(
