@@ -31,18 +31,18 @@ class NotificationService {
     // _navigationService.navigateTo('/setting');
   }
 
-  getnotificationeveryday(String cases, String title) async {
-    var time = Time(14, 0, 0);
-    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        'repeatDailyAtTime channel id',
-        'Daily',
-        'repeatDailyAtTime description');
-    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
-    var platformChannelSpecifics = NotificationDetails(
-        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-    await flutterLocalNotificationsPlugin.showDailyAtTime(
-        0, title, cases, time, platformChannelSpecifics);
-  }
+  // getnotificationeveryday(String cases, String title) async {
+  //   var time = Time(14, 0, 0);
+  //   var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+  //       'repeatDailyAtTime channel id',
+  //       'Daily',
+  //       'repeatDailyAtTime description');
+  //   var iOSPlatformChannelSpecifics = IOSNotificationDetails();
+  //   var platformChannelSpecifics = NotificationDetails(
+  //       androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+  //   await flutterLocalNotificationsPlugin.showDailyAtTime(
+  //       0, title, cases, time, platformChannelSpecifics);
+  // }
 
   // String _toTwoDigitString(int value) {
   //   return value.toString().padLeft(2, '0');
@@ -53,13 +53,14 @@ class NotificationService {
   }
 
   showNotification(String cases) async {
-    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        'your channel id', 'your channel name', 'your channel description',
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails('Case_0',
+        'Countries Watching', 'Getting Data\'s of the countries you selected',
         importance: Importance.Max, priority: Priority.High, ticker: 'ticker');
     var iOSPlatformChannelSpecifics = IOSNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-    if (cases != null || cases != "") {
+    print(cases.length);
+    if (cases.length != 0) {
       await flutterLocalNotificationsPlugin.show(
           0, "Today Reported Cases", cases, platformChannelSpecifics,
           payload: "country");

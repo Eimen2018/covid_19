@@ -24,6 +24,7 @@ class SettingView extends StatefulWidget {
 class _SettingViewState extends State<SettingView> {
   final controller = ScrollController();
   double offset = 0;
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   void onScroll() {
     setState(() {
@@ -56,15 +57,16 @@ class _SettingViewState extends State<SettingView> {
         model.fetchAllcountries();
         if (prefs.getBool("isSwitched") != null)
           model.isSwitched = prefs.getBool("isSwitched");
-        if (model.isSwitched) {
+        if (model.isSwitched && streamSubscription == null) {
           streamSubscription = model.getCountrydata(prefs).listen((value) {
-            // print('Value from controller: '+value.toString());
-            widget.notificationService.showNotification(value);
+            print('Value from controller: ' + value.toString());
+            // widget.notificationService.showNotification(value);
           });
         }
       },
       viewModelBuilder: () => SettingViewModel(),
       builder: (context, model, child) => Scaffold(
+        key: _scaffoldKey,
         body: SingleChildScrollView(
           controller: controller,
           child: Column(
@@ -232,13 +234,16 @@ class _SettingViewState extends State<SettingView> {
                                                                 !model
                                                                     .isSwitched)
                                                             ? null
-                                                            : () {
-                                                                model.searchPage(
+                                                            : () async{
+                                                                String length =
+                                                                    model.getPrefLength(
+                                                                        prefs);
+                                                                await model.searchPage(
                                                                     context,
                                                                     prefs,
                                                                     widget
                                                                         .notificationService);
-                                                                Future.delayed(
+                                                                 Future.delayed(
                                                                     Duration(
                                                                         milliseconds:
                                                                             600),
@@ -247,6 +252,28 @@ class _SettingViewState extends State<SettingView> {
                                                                       .setStatusBarWhiteForeground(
                                                                           false);
                                                                 });
+                                                                if (length !=
+                                                                    model.getPrefLength(
+                                                                        prefs)) {
+                                                                  _scaffoldKey
+                                                                      .currentState
+                                                                      .showSnackBar(
+                                                                          SnackBar(
+                                                                    content:
+                                                                        Text(
+                                                                      "Country Added to Notification Set",
+                                                                      style: TextStyle(
+                                                                          color:
+                                                                              Colors.white),
+                                                                    ),
+                                                                    duration: Duration(
+                                                                        seconds:
+                                                                            2),
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .black87,
+                                                                  ));
+                                                                }
                                                               },
                                                     child: Container(
                                                       width: 30,
@@ -384,17 +411,24 @@ class _SettingViewState extends State<SettingView> {
                                                                         'notificationcountry')[
                                                                     index],
                                                                 prefs);
-                                                            // widget
-                                                            //     .notificationService
-                                                            //     .cancelNotification();
-                                                            // widget.notificationService.getnotificationeveryday(
-                                                            //     await model
-                                                            //         .getnotificationStrings(
-                                                            //             prefs),
-                                                            //     (model.checkSharedpreference(
-                                                            //             prefs))
-                                                            //         ? "Set Notification"
-                                                            //         : "Today Reported Cases");
+                                                            _scaffoldKey
+                                                                .currentState
+                                                                .showSnackBar(
+                                                                    SnackBar(
+                                                              content: Text(
+                                                                "Country Removed From Notification Set",
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .white),
+                                                              ),
+                                                              duration:
+                                                                  Duration(
+                                                                      seconds:
+                                                                          2),
+                                                              backgroundColor:
+                                                                  Colors
+                                                                      .black87,
+                                                            ));
 
                                                             print(
                                                                 "Notification Set...");

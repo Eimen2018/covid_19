@@ -108,10 +108,14 @@ class _HomeViewState extends State<HomeView> {
                               model.setcountry('Global');
                               prefs.clear();
                               model.fetchWorldData();
+                              model.fetchMostAffected();
+                              model.fetchMostAffectedCases();
                             },
                             onTap: () {
                               model.setcountry('Global');
                               model.fetchWorldData();
+                              model.fetchMostAffected();
+                              model.fetchMostAffectedCases();
                             },
                             child: Container(
                               padding: EdgeInsets.all(15),

@@ -118,7 +118,9 @@ class SettingViewModel extends BaseViewModel {
       a = json.decode(response.body);
       prefs.getStringList('notificationcountry').forEach((element) {
         var c = a.firstWhere((e) => (e['country'].toString() == element));
-        b += element + ": " + c['todayCases'].toString() + " \n";
+        if(c['todayCases']==0)
+        b += element + ": " + "Waiting Update" + " \n";
+        else b += element + ": " + c['todayCases'].toString() + " \n";
       });
     } catch (e) {
       print(e);
