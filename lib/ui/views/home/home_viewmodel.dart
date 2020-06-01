@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
-import 'package:connectivity/connectivity.dart';
 import 'package:covid_19/app/locator.dart';
 import 'package:covid_19/app/router.gr.dart';
 import 'package:flutter/material.dart';
@@ -13,8 +11,6 @@ import 'package:charts_flutter/flutter.dart' as charts;
 
 class HomeViewModel extends BaseViewModel {
   final NavigationService _navigationService = locator<NavigationService>();
-  Map _source = {ConnectivityResult.none: false};
-  MyConnectivity _connectivity = MyConnectivity.instance;
 
   String _country = 'Global';
   String get country => _country;
@@ -25,24 +21,6 @@ class HomeViewModel extends BaseViewModel {
   bool _moreInfo = false;
   bool get moreInfo => _moreInfo;
 
-  void showHide() async {
-    if (_height == 300) {
-      _height = 90;
-      _moreInfo = false;
-    } else if (_height == 90) {
-      _height = 300;
-      notifyListeners();
-      await new Future.delayed(const Duration(milliseconds: 510));
-      _moreInfo = true;
-    }
-    notifyListeners();
-  }
-
-  void setcountry(String country) {
-    _country = country;
-    notifyListeners();
-  }
-
   Map _worldData;
   Map get worldData => _worldData;
 
@@ -52,11 +30,20 @@ class HomeViewModel extends BaseViewModel {
   List _mostAffectedYesterday;
   List get mostAffectedYesterday => _mostAffectedYesterday;
 
+  List _mostAffectedCases;
+  List get mostAffectedCases => _mostAffectedCases;
+
+  List _mostAffectedCasesYesterday;
+  List get mostAffectedCasesYesterday => _mostAffectedCasesYesterday;
+
   List _countryData;
   List get countryData => _countryData;
 
   List _historicalData;
   List get historicalData => _historicalData;
+
+  int _timeStamp;
+  int get timeStamp => _timeStamp;
 
   List<charts.Series<TimeSeriesSales, DateTime>> _linebar;
   List<charts.Series<TimeSeriesSales, DateTime>> get linebar => _linebar;
@@ -64,66 +51,191 @@ class HomeViewModel extends BaseViewModel {
   Map _allhistoricalData;
   Map get allhistoricalData => _allhistoricalData;
 
-  fetchWorldData() async {
-    _worldData = null;
-    http.Response response = await http.get('http://corona.lmao.ninja/v2/all');
-    _worldData = json.decode(response.body);
+  int _pageIndicator = 0;
+  int get pageIndicator => _pageIndicator;
+  int _pageIndicator2 = 0;
+  int get pageIndicator2 => _pageIndicator2;
+  List<String> _notificatioinCases;
+  List<String> get notificationCases => _notificatioinCases;
+  int trial = 0;
+  Map<String, String> endOfTrial = Map();
+
+  changePageindicator(int current, int slider) {
+    if (slider == 1) _pageIndicator = current;
+    if (slider == 2) _pageIndicator2 = current;
     notifyListeners();
   }
 
-  fetchcountryData() async {
+  void showHide() async {
+    if (_height == 310) {
+      _height = 90;
+      _moreInfo = false;
+    } else if (_height == 90) {
+      _height = 310;
+      notifyListeners();
+      await new Future.delayed(const Duration(milliseconds: 510));
+      _moreInfo = true;
+    }
+    notifyListeners();
+  }
+
+  void setcountry(String country) {
+    _country = country;
+    _worldData = null;
+    _linebar = null;
     _allhistoricalData = null;
     notifyListeners();
-    _worldData = null;
-    http.Response response =
-        await http.get('https://disease.sh/v2/countries/' + country);
-    _worldData = json.decode(response.body);
+  }
+
+  addcoma(int number) {
+    String num = number.toString();
+    num = num.replaceAllMapped(
+        new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+    return num;
+  }
+
+  fetchWorldData() async {
+    try {
+      http.Response response =
+          await http.get('http://corona.lmao.ninja/v2/all');
+      _worldData = json.decode(response.body);
+      _timeStamp = worldData['updated'];
+    } catch (e) {
+      print(e);
+      if (trial < 3) {
+        fetchWorldData();
+        trial++;
+      } else
+        endOfTrial.addAll({"WorldData": "Failed to Load World Data"});
+    }
+    notifyListeners();
+    fetchMostAffected();
+    // return _worldData;
+  }
+
+  // Future<Map> fetchWorldData() => locator<Api>().getData();
+
+  fetchcountryData() async {
+    // _allhistoricalData = null;
+    // notifyListeners();
+    // _worldData = null;
+    try {
+      http.Response response =
+          await http.get('https://disease.sh/v2/countries/' + country);
+      _worldData = json.decode(response.body);
+      _timeStamp = worldData['updated'];
+    } catch (e) {
+      print(e);
+      if (trial < 10) {
+        fetchcountryData();
+        trial++;
+      } else
+        endOfTrial.addAll({"CountryData": "Failed to Load Country Data"});
+    }
+
     notifyListeners();
     fetchHistoricalDatacountries();
+    // return _worldData;
   }
 
   fetchMostAffected() async {
-    http.Response response =
-        await http.get('https://disease.sh/v2/countries?sort=deaths');
-    _mostAffected = json.decode(response.body);
-    response = await http
-        .get('https://disease.sh/v2/countries?yesterday=true&sort=deaths');
-    _mostAffectedYesterday = json.decode(response.body);
+    try {
+      http.Response response =
+          await http.get('https://disease.sh/v2/countries?sort=deaths');
+      _mostAffected = json.decode(response.body);
+      response = await http
+          .get('https://disease.sh/v2/countries?yesterday=true&sort=deaths');
+      _mostAffectedYesterday = json.decode(response.body);
+    } catch (e) {
+      print(e);
+      if (trial < 10) {
+        fetchMostAffected();
+        trial++;
+      } else
+        endOfTrial
+            .addAll({"MostAffected": "Failed to Load Most Affected Data"});
+    }
     notifyListeners();
+    // return _mostAffected;
+  }
+
+  fetchMostAffectedCases() async {
+    try {
+      http.Response response =
+          await http.get('https://disease.sh/v2/countries?sort=cases');
+      _mostAffectedCases = json.decode(response.body);
+      response = await http
+          .get('https://disease.sh/v2/countries?yesterday=true&sort=cases');
+      _mostAffectedCasesYesterday = json.decode(response.body);
+    } catch (e) {
+      print(e);
+      if (trial < 10) {
+        fetchMostAffectedCases();
+        trial++;
+      } else
+        endOfTrial
+            .addAll({"MostAffected": "Failed to Load Most Affected Data"});
+    }
+    notifyListeners();
+    // return _mostAffectedCases;
   }
 
   fetchAllcountries() async {
-    http.Response response = await http.get('https://disease.sh/v2/countries');
-    _countryData = json.decode(response.body);
+    try {
+      http.Response response =
+          await http.get('https://disease.sh/v2/countries');
+      _countryData = json.decode(response.body);
+    } catch (e) {
+      print(e);
+      if (trial < 10) {
+        fetchAllcountries();
+        trial++;
+      } else
+        endOfTrial.addAll({"ListCountries": "Failed to Load Country List"});
+    }
+    notifyListeners();
   }
 
   fetchHistoricalDatacountries() async {
-    _allhistoricalData = null;
-    http.Response response = await http
-        .get('https://disease.sh/v2/historical/' + _country + '?lastdays=60');
-    _allhistoricalData = json.decode(response.body);
-    _linebar = List<charts.Series<TimeSeriesSales, DateTime>>();
-    _linebar.add(charts.Series(
-      colorFn: (__, _) => charts.ColorUtil.fromDartColor(Colors.orange),
-      id: 'cases',
-      domainFn: (TimeSeriesSales sales, _) => sales.time,
-      measureFn: (TimeSeriesSales sales, _) => sales.sales,
-      data: changedata(_allhistoricalData['timeline']['cases']),
-    ));
-    _linebar.add(charts.Series(
-      colorFn: (__, _) => charts.ColorUtil.fromDartColor(Colors.red),
-      id: 'deaths',
-      domainFn: (TimeSeriesSales sales, _) => sales.time,
-      measureFn: (TimeSeriesSales sales, _) => sales.sales,
-      data: changedata(_allhistoricalData['timeline']['deaths']),
-    ));
-    _linebar.add(charts.Series(
-      colorFn: (__, _) => charts.ColorUtil.fromDartColor(Colors.green),
-      id: 'recovered',
-      domainFn: (TimeSeriesSales sales, _) => sales.time,
-      measureFn: (TimeSeriesSales sales, _) => sales.sales,
-      data: changedata(_allhistoricalData['timeline']['recovered']),
-    ));
+    try {
+      http.Response response = await http
+          .get('https://disease.sh/v2/historical/' + _country + '?lastdays=60');
+      if (response.statusCode != 404) {
+        _allhistoricalData = json.decode(response.body);
+        _linebar = new List<charts.Series<TimeSeriesSales, DateTime>>();
+        _linebar.add(charts.Series(
+          colorFn: (__, _) => charts.ColorUtil.fromDartColor(Colors.orange),
+          id: 'cases',
+          domainFn: (TimeSeriesSales sales, _) => sales.time,
+          measureFn: (TimeSeriesSales sales, _) => sales.sales,
+          data: changedata(_allhistoricalData['timeline']['cases']),
+        ));
+        _linebar.add(charts.Series(
+          colorFn: (__, _) => charts.ColorUtil.fromDartColor(Colors.red),
+          id: 'deaths',
+          domainFn: (TimeSeriesSales sales, _) => sales.time,
+          measureFn: (TimeSeriesSales sales, _) => sales.sales,
+          data: changedata(_allhistoricalData['timeline']['deaths']),
+        ));
+        _linebar.add(charts.Series(
+          colorFn: (__, _) => charts.ColorUtil.fromDartColor(Colors.green),
+          id: 'recovered',
+          domainFn: (TimeSeriesSales sales, _) => sales.time,
+          measureFn: (TimeSeriesSales sales, _) => sales.sales,
+          data: changedata(_allhistoricalData['timeline']['recovered']),
+        ));
+      } else {
+        _allhistoricalData = {"message": "No Data"};
+        _linebar = new List<charts.Series<TimeSeriesSales, DateTime>>();
+      }
+    } catch (e) {
+      print(e);
+      if (trial < 10) {
+        fetchHistoricalDatacountries();
+        trial++;
+      } else
+        endOfTrial.addAll({"Historical": "Failed to Load Historical Data"});
+    }
     notifyListeners();
   }
 
@@ -147,42 +259,4 @@ class TimeSeriesSales {
   final Color color;
 
   TimeSeriesSales(this.time, this.sales, this.color);
-}
-
-class MyConnectivity {
-  MyConnectivity._internal();
-
-  static final MyConnectivity _instance = MyConnectivity._internal();
-
-  static MyConnectivity get instance => _instance;
-
-  Connectivity connectivity = Connectivity();
-
-  StreamController controller = StreamController.broadcast();
-
-  Stream get myStream => controller.stream;
-
-  void initialise() async {
-    ConnectivityResult result = await connectivity.checkConnectivity();
-    _checkStatus(result);
-    connectivity.onConnectivityChanged.listen((result) {
-      _checkStatus(result);
-    });
-  }
-
-  void _checkStatus(ConnectivityResult result) async {
-    bool isOnline = false;
-    try {
-      final result = await InternetAddress.lookup('https://www.google.com');
-      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        isOnline = true;
-      } else
-        isOnline = false;
-    } on SocketException catch (_) {
-      isOnline = false;
-    }
-    controller.sink.add({result: isOnline});
-  }
-
-  void disposeStream() => controller.close();
 }

@@ -1,11 +1,8 @@
-import 'package:covid_19/app/locator.dart';
-import 'package:covid_19/app/router.gr.dart';
 import 'package:covid_19/constant.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:stacked_services/stacked_services.dart';
 
 class MyHeader extends StatefulWidget {
   final String image;
@@ -13,22 +10,20 @@ class MyHeader extends StatefulWidget {
   final String textBottom;
   final double offset;
   final String page;
-  const MyHeader(
-      {Key key,
-      this.image,
-      this.textTop,
-      this.textBottom,
-      this.offset,
-      this.page})
-      : super(key: key);
+  const MyHeader({
+    Key key,
+    this.image,
+    this.textTop,
+    this.textBottom,
+    this.offset,
+    this.page,
+  }) : super(key: key);
 
   @override
   _MyHeaderState createState() => _MyHeaderState();
 }
 
 class _MyHeaderState extends State<MyHeader> {
-  final NavigationService _navigationService = locator<NavigationService>();
-
   @override
   Widget build(BuildContext context) {
     return ClipPath(
@@ -60,11 +55,12 @@ class _MyHeaderState extends State<MyHeader> {
               : CrossAxisAlignment.end,
           children: <Widget>[
             GestureDetector(
-              onTap: () async {
+              onTap: () {
                 if (widget.page == "Info")
-                  await _navigationService.navigateTo(Routes.homeView);
+                  Navigator.of(context).pop();
                 else
-                  await _navigationService.navigateTo(Routes.infoViewRoute);
+                  Scaffold.of(context).openEndDrawer();
+                // await _navigationService.navigateTo(Routes.infoViewRoute);
               },
               child: widget.page == "Info"
                   ? Row(
@@ -77,11 +73,26 @@ class _MyHeaderState extends State<MyHeader> {
                       ],
                     )
                   : Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        IconButton(
-                            icon:
-                                Theme.of(context).brightness == Brightness.light
+                        GestureDetector(
+                          onTap: () {
+                            Scaffold.of(context).openDrawer();
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 2.0),
+                            child: FaIcon(
+                              FontAwesomeIcons.cog,
+                              color: Colors.white,
+                              size: 22,
+                            ),
+                          ),
+                        ),
+                        Row(
+                          children: <Widget>[
+                            IconButton(
+                                icon: Theme.of(context).brightness ==
+                                        Brightness.light
                                     ? FaIcon(
                                         FontAwesomeIcons.moon,
                                         color: Colors.white,
@@ -92,19 +103,23 @@ class _MyHeaderState extends State<MyHeader> {
                                         color: Color(0xfff9d71c),
                                         size: 22,
                                       ),
-                            onPressed: () {
-                              DynamicTheme.of(context).setBrightness(
-                                  Theme.of(context).brightness ==
-                                          Brightness.light
-                                      ? Brightness.dark
-                                      : Brightness.light);
-                            }),
-                        SizedBox(
-                          width: 10,
+                                onPressed: () {
+                                  DynamicTheme.of(context).setBrightness(
+                                      Theme.of(context).brightness ==
+                                              Brightness.light
+                                          ? Brightness.dark
+                                          : Brightness.light);
+                                }),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Container(
+                                // color: Colors.yellow,
+                                padding: EdgeInsets.all(10),
+                                child:
+                                    SvgPicture.asset("assets/icons/menu.svg")),
+                          ],
                         ),
-                        Container(
-                            padding: EdgeInsets.all(5),
-                            child: SvgPicture.asset("assets/icons/menu.svg")),
                       ],
                     ),
             ),

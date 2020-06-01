@@ -1,17 +1,24 @@
-import 'package:carousel_slider/carousel_slider.dart';
+import 'dart:async';
 import 'package:connectivity/connectivity.dart';
+import 'package:covid_19/app/locator.dart';
 import 'package:covid_19/enums/connectivity_status.dart';
+import 'package:covid_19/services/notification_service.dart';
 import 'package:covid_19/ui/views/home/home_viewmodel.dart';
+import 'package:covid_19/ui/views/home/mostaffectedcases.dart';
+import 'package:covid_19/ui/views/home/mostaffecteddeaths.dart';
+import 'package:covid_19/ui/views/home/worldData.dart';
+import 'package:covid_19/ui/views/info/info_view.dart';
+import 'package:covid_19/ui/views/setting/setting_view.dart';
 import 'package:covid_19/widgets/analysisgraph.dart';
-import 'package:covid_19/widgets/counter.dart';
-import 'package:covid_19/widgets/moreinfo.dart';
-import 'package:covid_19/widgets/mostaffected.dart';
 import 'package:covid_19/widgets/my_header.dart';
+import 'package:covid_19/widgets/recent.dart';
 import 'package:covid_19/widgets/search.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stacked/stacked.dart';
 import 'package:time_formatter/time_formatter.dart';
 import '../../../constant.dart';
@@ -26,15 +33,10 @@ class _HomeViewState extends State<HomeView> {
   double offset = 0;
 
   @override
-  void initState() {
-    super.initState();
-    controller.addListener(onScroll);
-  }
-
-  @override
   void dispose() {
     controller.dispose();
     super.dispose();
+    subscription.cancel();
   }
 
   void onScroll() {
@@ -43,21 +45,41 @@ class _HomeViewState extends State<HomeView> {
     });
   }
 
-  int _current = 0;
+  SharedPreferences prefs;
+  StreamSubscription<ConnectivityResult> subscription;
+  NotificationService notificationService = locator<NotificationService>();
+
+  @override
+  void initState() {
+    super.initState();
+    controller.addListener(onScroll);
+    notificationService.initialize();
+  }
 
   @override
   Widget build(BuildContext context) {
     var connectionStatus = Provider.of<ConnectivityStatus>(context);
     return ViewModelBuilder<HomeViewModel>.reactive(
-      onModelReady: (model) {
-        // if (connectionStatus == ConnectivityStatus.Wifi||connectionStatus == ConnectivityStatus.Cellular) {
-        model.fetchWorldData();
-        model.fetchMostAffected();
-        model.fetchAllcountries();
-        // }
+      onModelReady: (model) async {
+        prefs = await SharedPreferences.getInstance();
+        subscription = Connectivity()
+            .onConnectivityChanged
+            .listen((ConnectivityResult result) {
+          if (result != ConnectivityResult.none) {
+            model.setcountry("Global");
+            model.fetchWorldData();
+            model.fetchAllcountries();
+            model.fetchMostAffected();
+            model.fetchMostAffectedCases();
+          }
+        });
       },
       viewModelBuilder: () => HomeViewModel(),
       builder: (context, model, child) => Scaffold(
+        endDrawer: InfoView(),
+        drawer: SettingView(
+          notificationService: notificationService,
+        ),
         body: SingleChildScrollView(
           controller: controller,
           child: Column(
@@ -69,72 +91,140 @@ class _HomeViewState extends State<HomeView> {
                 offset: offset,
                 page: "Home",
               ),
-              (connectionStatus == ConnectivityStatus.Offline)
+              (connectionStatus == ConnectivityStatus.Offline ||
+                      connectionStatus == null)
                   ? Center(
-                      child: Text("No Internet Connection"),
+                      child: Lottie.asset(
+                        'assets/networkLost.json',
+                        fit: BoxFit.fill,
+                      ),
                     )
                   : Column(children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.symmetric(horizontal: 20),
-                        padding:
-                            EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                        height: 60,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.blueGrey[900]
-                              : Colors.white,
-                          borderRadius: BorderRadius.circular(25),
-                          border: Border.all(
-                            color: Color(0xFFE5E5E5),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            GestureDetector(
-                              onTap: () {
-                                model.setcountry('Global');
-                                model.fetchWorldData();
-                                model.fetchMostAffected();
-                              },
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          GestureDetector(
+                            onLongPress: () {
+                              model.setcountry('Global');
+                              prefs.clear();
+                              model.fetchWorldData();
+                              model.fetchMostAffected();
+                              model.fetchMostAffectedCases();
+                            },
+                            onTap: () {
+                              model.setcountry('Global');
+                              model.fetchWorldData();
+                              model.fetchMostAffected();
+                              model.fetchMostAffectedCases();
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(15),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.blueGrey[900]
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(7),
+                                border: Border.all(
+                                  color: Color(0xFFE5E5E5),
+                                ),
+                              ),
                               child: Image.asset(
                                 "assets/icons/globe.png",
                                 width: 20,
                               ),
                             ),
-                            Text(
-                              model.country,
-                              style: kSubTextStyle.copyWith(
-                                  color: Theme.of(context).brightness ==
-                                          Brightness.light
-                                      ? Colors.black87
-                                      : Colors.white),
-                            ),
-                            IconButton(
-                                icon: Icon(
-                                  Icons.search,
-                                  color: Theme.of(context).brightness ==
-                                          Brightness.light
-                                      ? Colors.black87
-                                      : Colors.white54,
+                          ),
+                          GestureDetector(
+                            onTap: (model.countryData == null)
+                                ? null
+                                : () {
+                                    showSearch(
+                                        context: context,
+                                        delegate: Search(
+                                            countryList: model.countryData,
+                                            setCountry: model.setcountry,
+                                            updateWorlddata:
+                                                model.fetchcountryData,
+                                            prefs: prefs));
+                                    Future.delayed(Duration(milliseconds: 600),
+                                        () {
+                                      FlutterStatusbarcolor
+                                          .setStatusBarWhiteForeground(false);
+                                    });
+                                  },
+                            child: Container(
+                              margin: EdgeInsets.symmetric(horizontal: 10),
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 20),
+                              height: 60,
+                              width: MediaQuery.of(context).size.width - 100,
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.blueGrey[900]
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: Color(0xFFE5E5E5),
                                 ),
-                                onPressed: () {
-                                  showSearch(
-                                      context: context,
-                                      delegate: Search(
-                                          model.countryData,
-                                          model.setcountry,
-                                          model.fetchcountryData));
-                                  Future.delayed(Duration(milliseconds: 600),
-                                      () {
-                                    FlutterStatusbarcolor
-                                        .setStatusBarWhiteForeground(false);
-                                  });
-                                }),
-                          ],
-                        ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Text(
+                                    model.country,
+                                    style: kSubTextStyle.copyWith(
+                                        color: Theme.of(context).brightness ==
+                                                Brightness.light
+                                            ? Colors.black87
+                                            : Colors.white),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.search,
+                                      color: Theme.of(context).brightness ==
+                                              Brightness.light
+                                          ? Colors.black87
+                                          : Colors.white54,
+                                    ),
+                                    onPressed: (model.countryData == null)
+                                        ? null
+                                        : () {
+                                            showSearch(
+                                                context: context,
+                                                delegate: Search(
+                                                    countryList:
+                                                        model.countryData,
+                                                    setCountry:
+                                                        model.setcountry,
+                                                    updateWorlddata:
+                                                        model.fetchcountryData,
+                                                    prefs: prefs));
+                                            Future.delayed(
+                                                Duration(milliseconds: 600),
+                                                () {
+                                              FlutterStatusbarcolor
+                                                  .setStatusBarWhiteForeground(
+                                                      false);
+                                            });
+                                          },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
+                      (prefs != null)
+                          ? (prefs.getStringList('country') != null)
+                              ? Recent(
+                                  prefs: prefs,
+                                  setCountry: model.setcountry,
+                                  updateData: model.fetchcountryData)
+                              : SizedBox.shrink()
+                          : CupertinoActivityIndicator(),
                       SizedBox(height: 20),
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 20),
@@ -154,11 +244,10 @@ class _HomeViewState extends State<HomeView> {
                                             : kTitleTextstyle,
                                       ),
                                       TextSpan(
-                                        text: (model.worldData == null)
+                                        text: (model.timeStamp == null)
                                             ? "..."
                                             : "Last Update " +
-                                                formatTime(
-                                                    model.worldData['updated']),
+                                                formatTime(model.timeStamp),
                                         style: TextStyle(
                                           color: kTextLightColor,
                                         ),
@@ -190,188 +279,52 @@ class _HomeViewState extends State<HomeView> {
                               ],
                             ),
                             SizedBox(height: 20),
-                            Container(
-                              padding: EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Colors.blueGrey[900]
-                                    : Colors.white,
-                                boxShadow: [
-                                  BoxShadow(
-                                    offset: Offset(0, 4),
-                                    blurRadius: 30,
-                                    color: kShadowColor,
-                                  ),
-                                ],
-                              ),
-                              child: model.worldData == null
-                                  ? CupertinoActivityIndicator()
-                                  : AnimatedContainer(
-                                      height: model.height,
-                                      child: Column(
-                                        children: <Widget>[
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: <Widget>[
-                                              Counter(
-                                                color: kInfectedColor,
-                                                number:
-                                                    model.worldData['cases'],
-                                                title: "Infected",
-                                              ),
-                                              Counter(
-                                                color: kDeathColor,
-                                                number:
-                                                    model.worldData['deaths'],
-                                                title: "Deaths",
-                                              ),
-                                              Counter(
-                                                color: kRecovercolor,
-                                                number: model
-                                                    .worldData['recovered'],
-                                                title: "Recovered",
-                                              ),
-                                            ],
-                                          ),
-                                          (!model.moreInfo)
-                                              ? SizedBox.shrink()
-                                              : Column(
-                                                  children: <Widget>[
-                                                    SizedBox(
-                                                      height: 20,
-                                                    ),
-                                                    MoreInfo(
-                                                      worldData:
-                                                          model.worldData,
-                                                    ),
-                                                  ],
-                                                ),
-                                        ],
-                                      ),
-                                      duration: Duration(milliseconds: 500),
-                                    ),
-                            ),
+                            (model.endOfTrial["WorldData"] == null &&
+                                    model.endOfTrial["CountryData"] == null)
+                                ? WorldDataView()
+                                : IconButton(
+                                    icon: Icon(Icons.refresh),
+                                    onPressed: () {
+                                      model.setcountry("Global");
+                                      model.fetchWorldData();
+                                      model.fetchAllcountries();
+                                      model.fetchMostAffected();
+                                      model.fetchMostAffectedCases();
+                                    }),
                             SizedBox(height: 20),
                             (model.country == 'Global')
                                 ? Column(
                                     children: <Widget>[
-                                      model.mostAffected == null
-                                          ? Container(
-                                              padding: EdgeInsets.all(20),
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                                color: Theme.of(context)
-                                                            .brightness ==
-                                                        Brightness.dark
-                                                    ? Colors.blueGrey[900]
-                                                    : Colors.white,
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    offset: Offset(0, 4),
-                                                    blurRadius: 30,
-                                                    color: kShadowColor,
-                                                  ),
-                                                ],
-                                              ),
-                                              child:
-                                                  CupertinoActivityIndicator())
-                                          : Column(
-                                              children: <Widget>[
-                                                CarouselSlider(
-                                                  options: CarouselOptions(
-                                                      height: 340.0,
-                                                      aspectRatio: 1.0,
-                                                      viewportFraction: 1.2,
-                                                      initialPage: 0,
-                                                      scrollDirection:
-                                                          Axis.horizontal,
-                                                      enableInfiniteScroll:
-                                                          false,
-                                                      onPageChanged:
-                                                          (index, reason) {
-                                                        setState(() {
-                                                          _current = index;
-                                                        });
-                                                      }),
-                                                  items: [
-                                                    MostAffected(
-                                                      countryData:
-                                                          model.mostAffected,
-                                                      setCountry:
-                                                          model.setcountry,
-                                                      updateData: model
-                                                          .fetchcountryData,
-                                                      date: 'Today',
-                                                    ),
-                                                    MostAffected(
-                                                      countryData: model
-                                                          .mostAffectedYesterday,
-                                                      setCountry:
-                                                          model.setcountry,
-                                                      updateData: model
-                                                          .fetchcountryData,
-                                                      date: 'Yesterday',
-                                                    ),
-                                                  ].map((i) {
-                                                    return Builder(
-                                                      builder: (BuildContext
-                                                          context) {
-                                                        return i;
-                                                      },
-                                                    );
-                                                  }).toList(),
-                                                ),
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [1, 2].map((url) {
-                                                    int index =
-                                                        [1, 2].indexOf(url);
-                                                    return Container(
-                                                      width: 8.0,
-                                                      height: 8.0,
-                                                      margin:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 2.0),
-                                                      decoration: BoxDecoration(
-                                                        shape: BoxShape.circle,
-                                                        color: _current == index
-                                                            ? Theme.of(context)
-                                                                        .brightness ==
-                                                                    Brightness
-                                                                        .light
-                                                                ? Color.fromRGBO(
-                                                                    0,
-                                                                    0,
-                                                                    0,
-                                                                    0.9)
-                                                                : Colors.white
-                                                            : Theme.of(context)
-                                                                        .brightness ==
-                                                                    Brightness
-                                                                        .light
-                                                                ? Color
-                                                                    .fromRGBO(
-                                                                        0,
-                                                                        0,
-                                                                        0,
-                                                                        0.4)
-                                                                : Colors.grey,
-                                                      ),
-                                                    );
-                                                  }).toList(),
-                                                ),
-                                              ],
-                                            )
+                                      MostAffectedDeaths(),
+                                      SizedBox(
+                                        height: 20,
+                                      ),
+                                      MostAffectedCases(),
                                     ],
                                   )
-                                : AnalysisGraph(
-                                    allhistoricalData: model.allhistoricalData,
-                                    linebar: model.linebar),
+                                : (model.allhistoricalData == null)
+                                    ? Container(
+                                        padding: EdgeInsets.all(20),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          color: Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? Colors.blueGrey[900]
+                                              : Colors.white,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              offset: Offset(0, 4),
+                                              blurRadius: 30,
+                                              color: kShadowColor,
+                                            ),
+                                          ],
+                                        ),
+                                        child: CupertinoActivityIndicator())
+                                    : AnalysisGraph(
+                                        allhistoricalData:
+                                            model.allhistoricalData,
+                                        linebar: model.linebar)
                           ],
                         ),
                       ),

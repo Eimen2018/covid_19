@@ -1,29 +1,26 @@
+import 'package:covid_19/services/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class Search extends SearchDelegate {
+class SettingSearch extends SearchDelegate {
   final List countryList;
-  final Function setCountry;
-  final Function updateWorlddata;
   final SharedPreferences prefs;
-  Search({this.countryList, this.setCountry, this.updateWorlddata, this.prefs});
+  final Function getselected;
+  final NotificationService notificationService;
+  final Function getnotificationStrings;
+  final Function checkSharedpreference;
+  SettingSearch(
+      {this.getnotificationStrings,
+      this.checkSharedpreference,
+      this.notificationService,
+      this.countryList,
+      this.prefs,
+      this.getselected});
 
   @override
   List<Widget> buildActions(BuildContext context) {
     return [IconButton(icon: Icon(Icons.clear), onPressed: () => query = '')];
-  }
-
-  void getrecent(String country) {
-    if (this.prefs.getStringList('country') == null) {
-      this.prefs.setStringList('country', [country]);
-    } else {
-      List<String> a = this.prefs.getStringList('country');
-      int i = a.indexWhere((element) => element == country);
-      if (i < 0) a.insert(0, country);
-      if (a.length > 5) a.removeAt(5);
-      this.prefs.setStringList('country', a);
-    }
   }
 
   @override
@@ -82,9 +79,8 @@ class Search extends SearchDelegate {
             ),
             title: Text(suggestionList[index]['country'].toString()),
             onTap: () async {
-              this.setCountry(suggestionList[index]['country'].toString());
-              this.updateWorlddata();
-              getrecent(suggestionList[index]['country'].toString());
+              getselected(suggestionList[index]['country'].toString(), prefs);
+              print("Notification Update...");
               Navigator.pop(context);
             },
           );
@@ -132,9 +128,8 @@ class Search extends SearchDelegate {
             ),
             title: Text(suggestionList[index]['country'].toString()),
             onTap: () async {
-              this.setCountry(suggestionList[index]['country'].toString());
-              this.updateWorlddata();
-              getrecent(suggestionList[index]['country'].toString());
+              getselected(suggestionList[index]['country'].toString(), prefs);
+              print("Notification Update...");
               Navigator.pop(context);
             },
           );

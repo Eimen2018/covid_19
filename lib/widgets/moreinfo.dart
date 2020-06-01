@@ -19,20 +19,35 @@ class _MoreInfoState extends State<MoreInfo> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Counter(
-                  number: widget.worldData['critical'], color: Colors.purpleAccent, title: "Critical"),
+                  number: widget.worldData['critical'],
+                  color: Colors.purpleAccent,
+                  title: "Critical"),
               Counter(
                   number: widget.worldData['todayDeaths'],
-                  color: Colors.black,
+                  color: Theme.of(context).brightness == Brightness.light
+                      ? Colors.black
+                      : Colors.white,
                   title: "Today Deaths"),
-              Counter(number: widget.worldData['todayCases'], color: Colors.brown, title: "Today Cases"),
+              Counter(
+                  number: widget.worldData['active'],
+                  color: Colors.brown,
+                  title: "Active"),
             ],
           ),
-          SizedBox(height: 20,),
+          SizedBox(
+            height: 20,
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
-              Counter(number: widget.worldData['tests'], color: Colors.deepOrange, title: "Tests"),
-              Counter(number: widget.worldData['active'], color: Colors.indigoAccent, title: "Active"),
+              Counter(
+                  number: widget.worldData['tests'],
+                  color: Colors.deepOrange,
+                  title: "Tests"),
+              Counter(
+                  number: widget.worldData['population'],
+                  color: Colors.indigoAccent,
+                  title: "population"),
             ],
           )
         ],
