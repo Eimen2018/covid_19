@@ -4,6 +4,7 @@ import 'package:covid_19/app/locator.dart';
 import 'package:covid_19/app/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:http/http.dart' as http;
@@ -100,6 +101,7 @@ class HomeViewModel extends BaseViewModel {
           await http.get('http://corona.lmao.ninja/v2/all');
       _worldData = json.decode(response.body);
       _timeStamp = worldData['updated'];
+      endOfTrial['WorldData'] = null;
     } catch (e) {
       print(e);
       if (trial < 3) {
@@ -124,6 +126,7 @@ class HomeViewModel extends BaseViewModel {
           await http.get('https://disease.sh/v2/countries/' + country);
       _worldData = json.decode(response.body);
       _timeStamp = worldData['updated'];
+      endOfTrial['CountryData'] = null;
     } catch (e) {
       print(e);
       if (trial < 10) {
@@ -146,6 +149,7 @@ class HomeViewModel extends BaseViewModel {
       response = await http
           .get('https://disease.sh/v2/countries?yesterday=true&sort=deaths');
       _mostAffectedYesterday = json.decode(response.body);
+      endOfTrial['MostAffected'] = null;
     } catch (e) {
       print(e);
       if (trial < 10) {
@@ -167,6 +171,7 @@ class HomeViewModel extends BaseViewModel {
       response = await http
           .get('https://disease.sh/v2/countries?yesterday=true&sort=cases');
       _mostAffectedCasesYesterday = json.decode(response.body);
+      endOfTrial['MostAffected'] = null;
     } catch (e) {
       print(e);
       if (trial < 10) {
@@ -185,6 +190,7 @@ class HomeViewModel extends BaseViewModel {
       http.Response response =
           await http.get('https://disease.sh/v2/countries');
       _countryData = json.decode(response.body);
+      endOfTrial['ListCountries'] = null;
     } catch (e) {
       print(e);
       if (trial < 10) {
@@ -228,6 +234,7 @@ class HomeViewModel extends BaseViewModel {
         _allhistoricalData = {"message": "No Data"};
         _linebar = new List<charts.Series<TimeSeriesSales, DateTime>>();
       }
+      endOfTrial['Historical'] = null;
     } catch (e) {
       print(e);
       if (trial < 10) {

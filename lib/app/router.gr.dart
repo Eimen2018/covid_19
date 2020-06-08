@@ -10,6 +10,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:covid_19/ui/views/home/home_view.dart';
 import 'package:covid_19/ui/views/info/info_view.dart';
 import 'package:covid_19/ui/views/setting/setting_view.dart';
+import 'package:covid_19/services/notification_service.dart';
 
 abstract class Routes {
   static const homeView = '/';
@@ -32,6 +33,7 @@ class Router extends RouterBase {
 
   @override
   Route<dynamic> onGenerateRoute(RouteSettings settings) {
+    final args = settings.arguments;
     switch (settings.name) {
       case Routes.homeView:
         return MaterialPageRoute<dynamic>(
@@ -44,12 +46,30 @@ class Router extends RouterBase {
           settings: settings,
         );
       case Routes.setting:
+        if (hasInvalidArgs<SettingViewArguments>(args)) {
+          return misTypedArgsRoute<SettingViewArguments>(args);
+        }
+        final typedArgs =
+            args as SettingViewArguments ?? SettingViewArguments();
         return MaterialPageRoute<dynamic>(
-          builder: (context) => SettingView(),
+          builder: (context) => SettingView(
+              key: typedArgs.key,
+              notificationService: typedArgs.notificationService),
           settings: settings,
         );
       default:
         return unknownRoutePage(settings.name);
     }
   }
+}
+
+// *************************************************************************
+// Arguments holder classes
+// **************************************************************************
+
+//SettingView arguments holder class
+class SettingViewArguments {
+  final Key key;
+  final NotificationService notificationService;
+  SettingViewArguments({this.key, this.notificationService});
 }

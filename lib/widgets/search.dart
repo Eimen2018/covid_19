@@ -1,3 +1,6 @@
+import 'package:covid_19/widgets/recent.dart';
+import 'package:dynamic_theme/dynamic_theme.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,7 +10,12 @@ class Search extends SearchDelegate {
   final Function setCountry;
   final Function updateWorlddata;
   final SharedPreferences prefs;
-  Search({this.countryList, this.setCountry, this.updateWorlddata, this.prefs});
+  Search({
+    this.countryList,
+    this.setCountry,
+    this.updateWorlddata,
+    this.prefs,
+  });
 
   @override
   List<Widget> buildActions(BuildContext context) {
@@ -99,45 +107,71 @@ class Search extends SearchDelegate {
             .where((element) =>
                 element['country'].toString().toLowerCase().contains(query))
             .toList();
-    return ListView.builder(
-        itemCount: suggestionList.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            leading: Container(
-              width: 60,
-              padding: EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                  color: Theme.of(context).brightness == Brightness.light
-                      ? Colors.black12
-                      : Colors.blueGrey[900],
-                  borderRadius: BorderRadius.circular(5)),
-              child: Image.network(
-                suggestionList[index]['countryInfo']['flag'],
-                height: 30,
-                width: 50,
-                fit: BoxFit.fill,
-                loadingBuilder: (BuildContext context, Widget child,
-                    ImageChunkEvent loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Center(
-                    child: CircularProgressIndicator(
-                      value: loadingProgress.expectedTotalBytes != null
-                          ? loadingProgress.cumulativeBytesLoaded /
-                              loadingProgress.expectedTotalBytes
-                          : null,
+    return ListView(
+      children: <Widget>[
+        (prefs != null)
+            ? Column(
+                children: <Widget>[
+                  Recent(
+                    prefs: prefs,
+                    setcountry: setCountry,
+                    fetchcountryData: updateWorlddata,
+                  ),
+                  Divider(
+                    color:
+                        (DynamicTheme.of(context).brightness == Brightness.dark)
+                            ? Colors.white
+                            : Colors.grey,
+                    thickness: 1,
+                  ),
+                ],
+              )
+            : CupertinoActivityIndicator(),
+        Container(
+          height: MediaQuery.of(context).size.height,
+          child: ListView.builder(
+              itemCount: suggestionList.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  leading: Container(
+                    width: 60,
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        color: Theme.of(context).brightness == Brightness.light
+                            ? Colors.black12
+                            : Colors.blueGrey[900],
+                        borderRadius: BorderRadius.circular(5)),
+                    child: Image.network(
+                      suggestionList[index]['countryInfo']['flag'],
+                      height: 30,
+                      width: 50,
+                      fit: BoxFit.fill,
+                      loadingBuilder: (BuildContext context, Widget child,
+                          ImageChunkEvent loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                    loadingProgress.expectedTotalBytes
+                                : null,
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
-            ),
-            title: Text(suggestionList[index]['country'].toString()),
-            onTap: () async {
-              this.setCountry(suggestionList[index]['country'].toString());
-              this.updateWorlddata();
-              getrecent(suggestionList[index]['country'].toString());
-              Navigator.pop(context);
-            },
-          );
-        });
+                  ),
+                  title: Text(suggestionList[index]['country'].toString()),
+                  onTap: () async {
+                    this.setCountry(
+                        suggestionList[index]['country'].toString());
+                    this.updateWorlddata();
+                    getrecent(suggestionList[index]['country'].toString());
+                    Navigator.pop(context);
+                  },
+                );
+              }),
+        ),
+      ],
+    );
   }
 }

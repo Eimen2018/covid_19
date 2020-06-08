@@ -1,9 +1,7 @@
-import 'package:covid_19/app/locator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:injectable/injectable.dart';
-import 'package:stacked_services/stacked_services.dart';
 
 @lazySingleton
 class NotificationService {
@@ -65,6 +63,18 @@ class NotificationService {
           0, "Today Reported Cases", cases, platformChannelSpecifics,
           payload: "country");
     }
+  }
+
+  showfunctioninterval() async {
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        'repeating channel id',
+        'repeating channel name',
+        'repeating description');
+    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
+    var platformChannelSpecifics = NotificationDetails(
+        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.periodicallyShow(0, 'repeating title',
+        'repeating body', RepeatInterval.EveryMinute, platformChannelSpecifics);
   }
 
   Future onDidReceiveLocalNotification(

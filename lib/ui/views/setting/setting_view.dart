@@ -45,8 +45,6 @@ class _SettingViewState extends State<SettingView> {
   }
 
   SharedPreferences prefs;
-  // Stream stream;
-  StreamSubscription<dynamic> streamSubscription;
   @override
   Widget build(BuildContext context) {
     // var connectionStatus = Provider.of<ConnectivityStatus>(context);
@@ -57,12 +55,6 @@ class _SettingViewState extends State<SettingView> {
         model.fetchAllcountries();
         if (prefs.getBool("isSwitched") != null)
           model.isSwitched = prefs.getBool("isSwitched");
-        if (model.isSwitched && streamSubscription == null) {
-          streamSubscription = model.getCountrydata(prefs).listen((value) {
-            print('Value from controller: ' + value.toString());
-            // widget.notificationService.showNotification(value);
-          });
-        }
       },
       viewModelBuilder: () => SettingViewModel(),
       builder: (context, model, child) => Scaffold(
@@ -104,10 +96,7 @@ class _SettingViewState extends State<SettingView> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: <Widget>[
-                              Icon(
-                                Icons.arrow_back_ios,
-                                color: Colors.white,
-                              ),
+                              Icon(Icons.close, color: Colors.white, size: 30),
                             ],
                           )),
                       SizedBox(height: 20),
@@ -156,28 +145,7 @@ class _SettingViewState extends State<SettingView> {
                                 value: model.isSwitched,
                                 onChanged: (value) async {
                                   model.changeisSwitched(value, prefs);
-                                  if (value) {
-                                    streamSubscription = model
-                                        .getCountrydata(prefs)
-                                        .listen((value) {
-                                      // print('Value from controller: $value');
-                                      widget.notificationService
-                                          .showNotification(value);
-                                    });
-                                    // widget.notificationService
-                                    //     .getnotificationeveryday(
-                                    //         await model
-                                    //             .getnotificationStrings(prefs),
-                                    //         (model.checkSharedpreference(prefs))
-                                    //             ? "Set Notification"
-                                    //             : "Today Reported Cases");
-                                    print("Notification Set...");
-                                  } else {
-                                    await streamSubscription.cancel();
-                                    print("Notification Cancelled");
-                                    // widget.notificationService
-                                    //     .cancelNotification();
-                                  }
+                                  if (value) {}
                                 },
                                 activeTrackColor: Color(0xFF3383CD),
                                 activeColor: Color(0xFF11249F),
@@ -228,53 +196,52 @@ class _SettingViewState extends State<SettingView> {
                                                       "/4"),
                                                   SizedBox(width: 5),
                                                   InkWell(
-                                                    onTap:
-                                                        (model.checkcountryDataandLength(
+                                                    onTap: (model
+                                                                .checkcountryDataandLength(
                                                                     prefs) ||
-                                                                !model
-                                                                    .isSwitched)
-                                                            ? null
-                                                            : () async{
-                                                                String length =
-                                                                    model.getPrefLength(
-                                                                        prefs);
-                                                                await model.searchPage(
-                                                                    context,
-                                                                    prefs,
-                                                                    widget
-                                                                        .notificationService);
-                                                                 Future.delayed(
+                                                            !model.isSwitched)
+                                                        ? null
+                                                        : () async {
+                                                            String length = model
+                                                                .getPrefLength(
+                                                                    prefs);
+                                                            await model.searchPage(
+                                                                context,
+                                                                prefs,
+                                                                widget
+                                                                    .notificationService);
+                                                            Future.delayed(
+                                                                Duration(
+                                                                    milliseconds:
+                                                                        600),
+                                                                () {
+                                                              FlutterStatusbarcolor
+                                                                  .setStatusBarWhiteForeground(
+                                                                      false);
+                                                            });
+                                                            if (length !=
+                                                                model.getPrefLength(
+                                                                    prefs)) {
+                                                              _scaffoldKey
+                                                                  .currentState
+                                                                  .showSnackBar(
+                                                                      SnackBar(
+                                                                content: Text(
+                                                                  "Country Added to Notification Set",
+                                                                  style: TextStyle(
+                                                                      color: Colors
+                                                                          .white),
+                                                                ),
+                                                                duration:
                                                                     Duration(
-                                                                        milliseconds:
-                                                                            600),
-                                                                    () {
-                                                                  FlutterStatusbarcolor
-                                                                      .setStatusBarWhiteForeground(
-                                                                          false);
-                                                                });
-                                                                if (length !=
-                                                                    model.getPrefLength(
-                                                                        prefs)) {
-                                                                  _scaffoldKey
-                                                                      .currentState
-                                                                      .showSnackBar(
-                                                                          SnackBar(
-                                                                    content:
-                                                                        Text(
-                                                                      "Country Added to Notification Set",
-                                                                      style: TextStyle(
-                                                                          color:
-                                                                              Colors.white),
-                                                                    ),
-                                                                    duration: Duration(
                                                                         seconds:
                                                                             2),
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .black87,
-                                                                  ));
-                                                                }
-                                                              },
+                                                                backgroundColor:
+                                                                    Colors
+                                                                        .black87,
+                                                              ));
+                                                            }
+                                                          },
                                                     child: Container(
                                                       width: 30,
                                                       height: 30,
@@ -406,7 +373,7 @@ class _SettingViewState extends State<SettingView> {
                                                         // SizedBox(width: 5),
                                                         GestureDetector(
                                                           onTap: () async {
-                                                            model.deleteNotificationCountry(
+                                                            await model.deleteNotificationCountry(
                                                                 prefs.getStringList(
                                                                         'notificationcountry')[
                                                                     index],
@@ -431,7 +398,7 @@ class _SettingViewState extends State<SettingView> {
                                                             ));
 
                                                             print(
-                                                                "Notification Set...");
+                                                                "Notification Canceled...");
                                                           },
                                                           child: Icon(
                                                             Icons.close,

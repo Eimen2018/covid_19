@@ -67,8 +67,9 @@ class _MyHeaderState extends State<MyHeader> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
                         Icon(
-                          Icons.arrow_back_ios,
+                          Icons.close,
                           color: Colors.white,
+                          size:30
                         ),
                       ],
                     )

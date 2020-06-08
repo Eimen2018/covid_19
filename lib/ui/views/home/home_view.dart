@@ -3,6 +3,7 @@ import 'package:connectivity/connectivity.dart';
 import 'package:covid_19/app/locator.dart';
 import 'package:covid_19/enums/connectivity_status.dart';
 import 'package:covid_19/services/notification_service.dart';
+import 'package:covid_19/ui/views/MessageHandler/MessageHandler.dart';
 import 'package:covid_19/ui/views/home/home_viewmodel.dart';
 import 'package:covid_19/ui/views/home/mostaffectedcases.dart';
 import 'package:covid_19/ui/views/home/mostaffecteddeaths.dart';
@@ -11,7 +12,6 @@ import 'package:covid_19/ui/views/info/info_view.dart';
 import 'package:covid_19/ui/views/setting/setting_view.dart';
 import 'package:covid_19/widgets/analysisgraph.dart';
 import 'package:covid_19/widgets/my_header.dart';
-import 'package:covid_19/widgets/recent.dart';
 import 'package:covid_19/widgets/search.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -99,256 +99,244 @@ class _HomeViewState extends State<HomeView> {
                         fit: BoxFit.fill,
                       ),
                     )
-                  : Column(children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          GestureDetector(
-                            onLongPress: () {
-                              model.setcountry('Global');
-                              prefs.clear();
-                              model.fetchWorldData();
-                              model.fetchMostAffected();
-                              model.fetchMostAffectedCases();
-                            },
-                            onTap: () {
-                              model.setcountry('Global');
-                              model.fetchWorldData();
-                              model.fetchMostAffected();
-                              model.fetchMostAffectedCases();
-                            },
-                            child: Container(
-                              padding: EdgeInsets.all(15),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Colors.blueGrey[900]
-                                    : Colors.white,
-                                borderRadius: BorderRadius.circular(7),
-                                border: Border.all(
-                                  color: Color(0xFFE5E5E5),
+                  : MessageHandler(
+                      child: Column(children: <Widget>[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            GestureDetector(
+                              onTap: () {
+                                model.setcountry('Global');
+                                model.fetchWorldData();
+                                model.fetchMostAffected();
+                                model.fetchMostAffectedCases();
+                              },
+                              child: Container(
+                                padding: EdgeInsets.all(15),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.blueGrey[900]
+                                      : Colors.white,
+                                  borderRadius: BorderRadius.circular(7),
+                                  border: Border.all(
+                                    color: Color(0xFFE5E5E5),
+                                  ),
                                 ),
-                              ),
-                              child: Image.asset(
-                                "assets/icons/globe.png",
-                                width: 20,
+                                child: Image.asset(
+                                  "assets/icons/globe.png",
+                                  width: 20,
+                                ),
                               ),
                             ),
-                          ),
-                          GestureDetector(
-                            onTap: (model.countryData == null)
-                                ? null
-                                : () {
-                                    showSearch(
-                                        context: context,
-                                        delegate: Search(
-                                            countryList: model.countryData,
-                                            setCountry: model.setcountry,
-                                            updateWorlddata:
-                                                model.fetchcountryData,
-                                            prefs: prefs));
-                                    Future.delayed(Duration(milliseconds: 600),
-                                        () {
-                                      FlutterStatusbarcolor
-                                          .setStatusBarWhiteForeground(false);
-                                    });
-                                  },
-                            child: Container(
-                              margin: EdgeInsets.symmetric(horizontal: 10),
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 20),
-                              height: 60,
-                              width: MediaQuery.of(context).size.width - 100,
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Colors.blueGrey[900]
-                                    : Colors.white,
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: Color(0xFFE5E5E5),
+                            GestureDetector(
+                              onTap: (model.countryData == null)
+                                  ? null
+                                  : () {
+                                      showSearch(
+                                          context: context,
+                                          delegate: Search(
+                                              countryList: model.countryData,
+                                              setCountry: model.setcountry,
+                                              updateWorlddata:
+                                                  model.fetchcountryData,
+                                              prefs: prefs));
+                                      Future.delayed(
+                                          Duration(milliseconds: 600), () {
+                                        FlutterStatusbarcolor
+                                            .setStatusBarWhiteForeground(false);
+                                      });
+                                    },
+                              child: Container(
+                                margin: EdgeInsets.symmetric(horizontal: 10),
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
+                                height: 60,
+                                width: MediaQuery.of(context).size.width - 100,
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.blueGrey[900]
+                                      : Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: Color(0xFFE5E5E5),
+                                  ),
                                 ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  Text(
-                                    model.country,
-                                    style: kSubTextStyle.copyWith(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Text(
+                                      model.country,
+                                      style: kSubTextStyle.copyWith(
+                                          color: Theme.of(context).brightness ==
+                                                  Brightness.light
+                                              ? Colors.black87
+                                              : Colors.white),
+                                    ),
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.search,
                                         color: Theme.of(context).brightness ==
                                                 Brightness.light
                                             ? Colors.black87
-                                            : Colors.white),
-                                  ),
-                                  IconButton(
-                                    icon: Icon(
-                                      Icons.search,
-                                      color: Theme.of(context).brightness ==
-                                              Brightness.light
-                                          ? Colors.black87
-                                          : Colors.white54,
+                                            : Colors.white54,
+                                      ),
+                                      onPressed: (model.countryData == null)
+                                          ? null
+                                          : () {
+                                              showSearch(
+                                                  context: context,
+                                                  delegate: Search(
+                                                      countryList:
+                                                          model.countryData,
+                                                      setCountry:
+                                                          model.setcountry,
+                                                      updateWorlddata: model
+                                                          .fetchcountryData,
+                                                      prefs: prefs));
+                                              Future.delayed(
+                                                  Duration(milliseconds: 600),
+                                                  () {
+                                                FlutterStatusbarcolor
+                                                    .setStatusBarWhiteForeground(
+                                                        false);
+                                              });
+                                            },
                                     ),
-                                    onPressed: (model.countryData == null)
-                                        ? null
-                                        : () {
-                                            showSearch(
-                                                context: context,
-                                                delegate: Search(
-                                                    countryList:
-                                                        model.countryData,
-                                                    setCountry:
-                                                        model.setcountry,
-                                                    updateWorlddata:
-                                                        model.fetchcountryData,
-                                                    prefs: prefs));
-                                            Future.delayed(
-                                                Duration(milliseconds: 600),
-                                                () {
-                                              FlutterStatusbarcolor
-                                                  .setStatusBarWhiteForeground(
-                                                      false);
-                                            });
-                                          },
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 20),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          child: Column(
+                            children: <Widget>[
+                              Row(
+                                children: <Widget>[
+                                  RichText(
+                                    text: TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: "Case Update\n",
+                                          style: Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? kTitleTextstyle.copyWith(
+                                                  color: Colors.white70)
+                                              : kTitleTextstyle,
+                                        ),
+                                        TextSpan(
+                                          text: (model.timeStamp == null)
+                                              ? "..."
+                                              : "Last Update " +
+                                                  formatTime(model.timeStamp),
+                                          style: TextStyle(
+                                            color: kTextLightColor,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Spacer(),
+                                  GestureDetector(
+                                    onTap: () async {
+                                      model.showHide();
+                                    },
+                                    child: model.height == 90
+                                        ? Text(
+                                            "See details",
+                                            style: TextStyle(
+                                              color: kPrimaryColor,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          )
+                                        : Text(
+                                            "Hide details",
+                                            style: TextStyle(
+                                              color: kPrimaryColor,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
                                   ),
                                 ],
                               ),
-                            ),
+                              SizedBox(height: 20),
+                              (model.endOfTrial["WorldData"] == null &&
+                                      model.endOfTrial["CountryData"] == null)
+                                  ? WorldDataView()
+                                  : IconButton(
+                                      icon: Icon(Icons.refresh),
+                                      onPressed: () {
+                                        model.setcountry("Global");
+                                        model.fetchWorldData();
+                                        model.fetchAllcountries();
+                                        model.fetchMostAffected();
+                                        model.fetchMostAffectedCases();
+                                      }),
+                              SizedBox(height: 20),
+                              (model.country == 'Global')
+                                  ? Column(
+                                      children: <Widget>[
+                                        MostAffectedDeaths(),
+                                        SizedBox(
+                                          height: 20,
+                                        ),
+                                        MostAffectedCases(),
+                                      ],
+                                    )
+                                  : (model.allhistoricalData == null)
+                                      ? Container(
+                                          padding: EdgeInsets.all(20),
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            color:
+                                                Theme.of(context).brightness ==
+                                                        Brightness.dark
+                                                    ? Colors.blueGrey[900]
+                                                    : Colors.white,
+                                            boxShadow: [
+                                              BoxShadow(
+                                                offset: Offset(0, 4),
+                                                blurRadius: 30,
+                                                color: kShadowColor,
+                                              ),
+                                            ],
+                                          ),
+                                          child: CupertinoActivityIndicator())
+                                      : AnalysisGraph(
+                                          allhistoricalData:
+                                              model.allhistoricalData,
+                                          linebar: model.linebar)
+                            ],
                           ),
-                        ],
-                      ),
-                      (prefs != null)
-                          ? (prefs.getStringList('country') != null)
-                              ? Recent(
-                                  prefs: prefs,
-                                  setCountry: model.setcountry,
-                                  updateData: model.fetchcountryData)
-                              : SizedBox.shrink()
-                          : CupertinoActivityIndicator(),
-                      SizedBox(height: 20),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20),
-                        child: Column(
-                          children: <Widget>[
-                            Row(
-                              children: <Widget>[
-                                RichText(
-                                  text: TextSpan(
-                                    children: [
-                                      TextSpan(
-                                        text: "Case Update\n",
-                                        style: Theme.of(context).brightness ==
-                                                Brightness.dark
-                                            ? kTitleTextstyle.copyWith(
-                                                color: Colors.white70)
-                                            : kTitleTextstyle,
-                                      ),
-                                      TextSpan(
-                                        text: (model.timeStamp == null)
-                                            ? "..."
-                                            : "Last Update " +
-                                                formatTime(model.timeStamp),
-                                        style: TextStyle(
-                                          color: kTextLightColor,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Spacer(),
-                                GestureDetector(
-                                  onTap: () async {
-                                    model.showHide();
-                                  },
-                                  child: model.height == 90
-                                      ? Text(
-                                          "See details",
-                                          style: TextStyle(
-                                            color: kPrimaryColor,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        )
-                                      : Text(
-                                          "Hide details",
-                                          style: TextStyle(
-                                            color: kPrimaryColor,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 20),
-                            (model.endOfTrial["WorldData"] == null &&
-                                    model.endOfTrial["CountryData"] == null)
-                                ? WorldDataView()
-                                : IconButton(
-                                    icon: Icon(Icons.refresh),
-                                    onPressed: () {
-                                      model.setcountry("Global");
-                                      model.fetchWorldData();
-                                      model.fetchAllcountries();
-                                      model.fetchMostAffected();
-                                      model.fetchMostAffectedCases();
-                                    }),
-                            SizedBox(height: 20),
-                            (model.country == 'Global')
-                                ? Column(
-                                    children: <Widget>[
-                                      MostAffectedDeaths(),
-                                      SizedBox(
-                                        height: 20,
-                                      ),
-                                      MostAffectedCases(),
-                                    ],
-                                  )
-                                : (model.allhistoricalData == null)
-                                    ? Container(
-                                        padding: EdgeInsets.all(20),
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                          color: Theme.of(context).brightness ==
-                                                  Brightness.dark
-                                              ? Colors.blueGrey[900]
-                                              : Colors.white,
-                                          boxShadow: [
-                                            BoxShadow(
-                                              offset: Offset(0, 4),
-                                              blurRadius: 30,
-                                              color: kShadowColor,
-                                            ),
-                                          ],
-                                        ),
-                                        child: CupertinoActivityIndicator())
-                                    : AnalysisGraph(
-                                        allhistoricalData:
-                                            model.allhistoricalData,
-                                        linebar: model.linebar)
-                          ],
                         ),
-                      ),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Container(
-                            padding: EdgeInsets.all(10),
-                            child: Text(
-                              "WE ARE TOGETHER IN THIS FIGHT",
-                              style: TextStyle(
-                                color: Theme.of(context).brightness ==
-                                        Brightness.light
-                                    ? Colors.black87
-                                    : Colors.white54,
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Container(
+                              padding: EdgeInsets.all(10),
+                              child: Text(
+                                "WE ARE TOGETHER IN THIS FIGHT",
+                                style: TextStyle(
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.light
+                                      ? Colors.black87
+                                      : Colors.white54,
+                                ),
                               ),
-                            ),
-                          )
-                        ],
-                      )
-                    ])
+                            )
+                          ],
+                        )
+                      ]),
+                    )
             ],
           ),
         ),

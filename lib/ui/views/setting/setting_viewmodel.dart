@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:covid_19/app/locator.dart';
+import 'package:covid_19/services/firestore_services.dart';
 import 'package:covid_19/services/notification_service.dart';
 import 'package:covid_19/widgets/settingsearch.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stacked/stacked.dart';
 
 class SettingViewModel extends BaseViewModel {
-  StreamController<String> controller = StreamController<String>();
+  // StreamController<String> controller = StreamController<String>();
+  final FirestoreServices _firestoreServices = locator<FirestoreServices>();
   bool _isSwitched = false;
   bool get isSwitched => _isSwitched;
   set isSwitched(bool value) {
@@ -19,6 +22,7 @@ class SettingViewModel extends BaseViewModel {
   changeisSwitched(bool value, SharedPreferences prefs) {
     _isSwitched = value;
     prefs.setBool("isSwitched", value);
+    _firestoreServices.notificationToggle(value);
     notifyListeners();
   }
 
@@ -62,10 +66,12 @@ class SettingViewModel extends BaseViewModel {
     }
   }
 
-  void deleteNotificationCountry(String country, SharedPreferences prefs) {
+  deleteNotificationCountry(String country, SharedPreferences prefs) async {
     List<String> a = prefs.getStringList('notificationcountry');
     a.removeWhere((element) => element == country);
-    prefs.setStringList('notificationcountry', a);
+    await prefs.setStringList('notificationcountry', a);
+    List<String> b = [country];
+    _firestoreServices.deleteNotificationCountry(b);
     notifyListeners();
   }
 
@@ -84,11 +90,14 @@ class SettingViewModel extends BaseViewModel {
   void getselected(String country, SharedPreferences prefs) {
     if (prefs.getStringList('notificationcountry') == null) {
       prefs.setStringList('notificationcountry', [country]);
+      _firestoreServices
+          .addNotificationCountry(prefs.getStringList('notificationcountry'));
     } else {
       List<String> a = prefs.getStringList('notificationcountry');
       int i = a.indexWhere((element) => element == country);
       if (i < 0) a.insert(0, country);
       prefs.setStringList('notificationcountry', a);
+      _firestoreServices.updateNotificationCountry(a);
     }
     notifyListeners();
   }
@@ -118,9 +127,10 @@ class SettingViewModel extends BaseViewModel {
       a = json.decode(response.body);
       prefs.getStringList('notificationcountry').forEach((element) {
         var c = a.firstWhere((e) => (e['country'].toString() == element));
-        if(c['todayCases']==0)
-        b += element + ": " + "Waiting Update" + " \n";
-        else b += element + ": " + c['todayCases'].toString() + " \n";
+        if (c['todayCases'] == 0)
+          b += element + ": " + "Waiting Update" + " \n";
+        else
+          b += element + ": " + c['todayCases'].toString() + " \n";
       });
     } catch (e) {
       print(e);
