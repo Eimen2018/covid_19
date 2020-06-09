@@ -4,7 +4,6 @@ import 'package:covid_19/app/router.gr.dart';
 import 'package:covid_19/constant.dart';
 import 'package:covid_19/enums/connectivity_status.dart';
 import 'package:covid_19/services/connectivity_services.dart';
-import 'package:covid_19/ui/views/MessageHandler/MessageHandler.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -25,8 +24,10 @@ void backgroundFetchHeadlessTask(String taskId) async {
     if (checkSharedpreference(prefs) && checkTime()) {
       notificationService.showNotificationReminder();
     }
-    List<String> b = await getnotificationStrings(prefs);
-    if (b.length > 0) notificationService.showNotification(b);
+    if (!checkSharedpreference(prefs)) {
+      List<String> b = await getnotificationStrings(prefs);
+      if (b.length > 0) notificationService.showNotification(b);
+    }
   }
   BackgroundFetch.finish(taskId);
 }
@@ -50,16 +51,22 @@ getnotificationStrings(SharedPreferences prefs) async {
     a = json.decode(response.body);
     prefs.getStringList('notificationcountry').forEach((element) {
       var c = a.firstWhere((e) => (e['country'].toString() == element));
+      print(prevCase);
+      print(b);
       if (c['todayCases'] != prevCase[element] && c['todayCases'] != 0) {
         prevCase[element] = c['todayCases'];
-        b = [element, c['todayCases'], c['todayDeaths'], c['todayRecovered']];
+        b = [
+          element,
+          c['todayCases'].toString(),
+          c['todayDeaths'].toString(),
+          c['todayRecovered'].toString()
+        ];
       }
     });
   } catch (e) {
     print(e);
     getnotificationStrings(prefs);
   }
-
   return b;
 }
 

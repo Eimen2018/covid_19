@@ -40,14 +40,15 @@ class _BackgroundState extends State<Background> {
       });
       // IMPORTANT:  You must signal completion of your task or the OS can punish your app
       // for taking too long in the background.
-
       SharedPreferences prefs = await SharedPreferences.getInstance();
       if (prefs.getBool("isSwitched") != null && prefs.getBool("isSwitched")) {
         if (checkSharedpreference(prefs) && checkTime()) {
           notificationService.showNotificationReminder();
         }
-        List<String> b = await getnotificationStrings(prefs);
-        if (b.length > 0) notificationService.showNotification(b);
+        if (!checkSharedpreference(prefs)) {
+          List<String> b = await getnotificationStrings(prefs);
+          if (b.length > 0) notificationService.showNotification(b);
+        }
       }
       BackgroundFetch.finish(taskId);
     }).then((int status) {
