@@ -46,7 +46,7 @@ class _SettingViewState extends State<SettingView> {
 
   SharedPreferences prefs;
   // Stream stream;
-  StreamSubscription<dynamic> streamSubscription;
+  // StreamSubscription<dynamic> streamSubscription;
   @override
   Widget build(BuildContext context) {
     // var connectionStatus = Provider.of<ConnectivityStatus>(context);
@@ -57,12 +57,12 @@ class _SettingViewState extends State<SettingView> {
         model.fetchAllcountries();
         if (prefs.getBool("isSwitched") != null)
           model.isSwitched = prefs.getBool("isSwitched");
-        if (model.isSwitched && streamSubscription == null) {
-          streamSubscription = model.getCountrydata(prefs).listen((value) {
-            print('Value from controller: ' + value.toString());
-            // widget.notificationService.showNotification(value);
-          });
-        }
+        // if (model.isSwitched && streamSubscription == null) {
+        //   streamSubscription = model.getCountrydata(prefs).listen((value) {
+        //     print('Value from controller: ' + value.toString());
+        //     // widget.notificationService.showNotification(value);
+        //   });
+        // }
       },
       viewModelBuilder: () => SettingViewModel(),
       builder: (context, model, child) => Scaffold(
@@ -157,13 +157,13 @@ class _SettingViewState extends State<SettingView> {
                                 onChanged: (value) async {
                                   model.changeisSwitched(value, prefs);
                                   if (value) {
-                                    streamSubscription = model
-                                        .getCountrydata(prefs)
-                                        .listen((value) {
-                                      // print('Value from controller: $value');
-                                      widget.notificationService
-                                          .showNotification(value);
-                                    });
+                                    // streamSubscription = model
+                                    //     .getCountrydata(prefs)
+                                    //     .listen((value) {
+                                    //   // print('Value from controller: $value');
+                                    //   widget.notificationService
+                                    //       .showNotification(value);
+                                    // });
                                     // widget.notificationService
                                     //     .getnotificationeveryday(
                                     //         await model
@@ -173,7 +173,7 @@ class _SettingViewState extends State<SettingView> {
                                     //             : "Today Reported Cases");
                                     print("Notification Set...");
                                   } else {
-                                    await streamSubscription.cancel();
+                                    // await streamSubscription.cancel();
                                     print("Notification Cancelled");
                                     // widget.notificationService
                                     //     .cancelNotification();
