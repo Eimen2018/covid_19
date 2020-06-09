@@ -8,11 +8,9 @@ class SettingSearch extends SearchDelegate {
   final SharedPreferences prefs;
   final Function getselected;
   final NotificationService notificationService;
-  final Function getnotificationStrings;
   final Function checkSharedpreference;
   SettingSearch(
-      {this.getnotificationStrings,
-      this.checkSharedpreference,
+      {this.checkSharedpreference,
       this.notificationService,
       this.countryList,
       this.prefs,

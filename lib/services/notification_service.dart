@@ -29,8 +29,9 @@ class NotificationService {
     // _navigationService.navigateTo('/setting');
   }
 
-  // getnotificationeveryday(String cases, String title) async {
-  //   var time = Time(14, 0, 0);
+  // getnotificationeveryday() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   var time = Time(15, 0, 0);
   //   var androidPlatformChannelSpecifics = AndroidNotificationDetails(
   //       'repeatDailyAtTime channel id',
   //       'Daily',
@@ -38,8 +39,14 @@ class NotificationService {
   //   var iOSPlatformChannelSpecifics = IOSNotificationDetails();
   //   var platformChannelSpecifics = NotificationDetails(
   //       androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-  //   await flutterLocalNotificationsPlugin.showDailyAtTime(
-  //       0, title, cases, time, platformChannelSpecifics);
+  //   if (prefs.getStringList('notificationcountry') == null ||
+  //       prefs.getStringList('notificationcountry').length == 0)
+  //     await flutterLocalNotificationsPlugin.showDailyAtTime(
+  //         0,
+  //         "Covid 19 Report",
+  //         "Select A Country in Settings to Recieve Today Case Notification",
+  //         time,
+  //         platformChannelSpecifics);
   // }
 
   // String _toTwoDigitString(int value) {
@@ -50,7 +57,22 @@ class NotificationService {
     await flutterLocalNotificationsPlugin.cancelAll();
   }
 
-  showNotification(String cases) async {
+  showNotificationReminder() async {
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails('Case_0',
+        'Countries Watching', 'Getting Data\'s of the countries you selected',
+        importance: Importance.Max, priority: Priority.High, ticker: 'ticker');
+    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
+    var platformChannelSpecifics = NotificationDetails(
+        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.show(
+        0,
+        "Reminder",
+        "Select A Country in Settings to Recieve Today Report Notification",
+        platformChannelSpecifics,
+        payload: "country");
+  }
+
+  showNotification(List<String> cases) async {
     var androidPlatformChannelSpecifics = AndroidNotificationDetails('Case_0',
         'Countries Watching', 'Getting Data\'s of the countries you selected',
         importance: Importance.Max, priority: Priority.High, ticker: 'ticker');
@@ -58,9 +80,12 @@ class NotificationService {
     var platformChannelSpecifics = NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
     print(cases.length);
-    if (cases.length != 0) {
+    if (cases.length > 0) {
       await flutterLocalNotificationsPlugin.show(
-          0, "Today Reported Cases", cases, platformChannelSpecifics,
+          0,
+          "${cases[0]} Today Reported ",
+          "${cases[1]} cases ${cases[2]} deaths ${cases[3]} recovered",
+          platformChannelSpecifics,
           payload: "country");
     }
   }
