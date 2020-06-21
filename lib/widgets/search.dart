@@ -105,7 +105,7 @@ class Search extends SearchDelegate {
         ? countryList
         : countryList
             .where((element) =>
-                element['country'].toString().toLowerCase().contains(query))
+                element['country'].toString().toLowerCase().contains(query.toLowerCase()))
             .toList();
     return ListView(
       children: <Widget>[

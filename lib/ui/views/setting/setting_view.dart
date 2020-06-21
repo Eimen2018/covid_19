@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:background_fetch/background_fetch.dart';
 import 'package:covid_19/constant.dart';
 import 'package:covid_19/services/notification_service.dart';
 import 'package:covid_19/ui/views/setting/setting_viewmodel.dart';
@@ -154,26 +155,21 @@ class _SettingViewState extends State<SettingView> {
                                 onChanged: (value) async {
                                   model.changeisSwitched(value, prefs);
                                   if (value) {
-                                    // streamSubscription = model
-                                    //     .getCountrydata(prefs)
-                                    //     .listen((value) {
-                                    //   // print('Value from controller: $value');
-                                    //   widget.notificationService
-                                    //       .showNotification(value);
-                                    // });
-                                    // widget.notificationService
-                                    //     .getnotificationeveryday(
-                                    //         await model
-                                    //             .getnotificationStrings(prefs),
-                                    //         (model.checkSharedpreference(prefs))
-                                    //             ? "Set Notification"
-                                    //             : "Today Reported Cases");
-                                    print("Notification Set...");
+                                    BackgroundFetch.start().then((int status) {
+                                      print(
+                                          '[BackgroundFetch] start success: $status');
+                                    }).catchError((e) {
+                                      print(
+                                          '[BackgroundFetch] start FAILURE: $e');
+                                    });
+                                    print("Notification Start...");
                                   } else {
-                                    // await streamSubscription.cancel();
+                                    BackgroundFetch.stop().then((int status) {
+                                      print(
+                                          '[BackgroundFetch] stop success: $status');
+                                    });
+
                                     print("Notification Cancelled");
-                                    // widget.notificationService
-                                    //     .cancelNotification();
                                   }
                                 },
                                 activeTrackColor: Color(0xFF3383CD),
@@ -215,7 +211,7 @@ class _SettingViewState extends State<SettingView> {
                                               : MainAxisAlignment.center,
                                       children: <Widget>[
                                         Text(
-                                          "Countries to Watch Data Change",
+                                          "Countries to Watch \nData Change",
                                         ),
                                         (!model.checkSharedpreference(prefs))
                                             ? Row(
@@ -223,7 +219,7 @@ class _SettingViewState extends State<SettingView> {
                                                   Text(model.getPrefLength(
                                                           prefs) +
                                                       "/4"),
-                                                  SizedBox(width: 5),
+                                                  SizedBox(width: 15),
                                                   InkWell(
                                                     onTap: (model
                                                                 .checkcountryDataandLength(

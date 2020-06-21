@@ -43,18 +43,18 @@ class WorldDataView extends HookViewModelWidget<HomeViewModel> {
                           children: <Widget>[
                             Counter(
                               color: kInfectedColor,
-                              number: model.worldData['cases'],
-                              title: "Infected",
+                              number: model.worldData['todayCases'],
+                              title: "Today\n Cases",
                             ),
                             Counter(
                               color: kDeathColor,
-                              number: model.worldData['deaths'],
-                              title: "Deaths",
+                              number: model.worldData['todayDeaths'],
+                              title: "Today\nDeaths",
                             ),
                             Counter(
                               color: kRecovercolor,
-                              number: model.worldData['recovered'],
-                              title: "Recovered",
+                              number: model.worldData['todayRecovered'],
+                              title: "Today\nRecovered",
                             ),
                           ],
                         ),
@@ -71,33 +71,6 @@ class WorldDataView extends HookViewModelWidget<HomeViewModel> {
                       ],
                     ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 30, vertical: 5),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5),
-                                border: Border.all(color: Colors.red)),
-                            child: Column(
-                              children: <Widget>[
-                                Text(
-                                  model.addcoma(model.worldData["todayCases"]),
-                                  style: TextStyle(
-                                      fontSize: 20, color: Colors.red),
-                                ),
-                                Text(
-                                  "Today Cases",
-                                  style: kSubTextStyle.copyWith(fontSize: 15),
-                                )
-                              ],
-                            ))
-                      ],
-                    ),
-                  )
                 ],
               ));
   }

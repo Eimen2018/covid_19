@@ -16,7 +16,7 @@ class HomeViewModel extends BaseViewModel {
   String _country = 'Global';
   String get country => _country;
 
-  double _height = 90;
+  double _height = 110;
   double get height => _height;
 
   bool _moreInfo = false;
@@ -69,9 +69,9 @@ class HomeViewModel extends BaseViewModel {
 
   void showHide() async {
     if (_height == 310) {
-      _height = 90;
+      _height = 110;
       _moreInfo = false;
-    } else if (_height == 90) {
+    } else if (_height == 110) {
       _height = 310;
       notifyListeners();
       await new Future.delayed(const Duration(milliseconds: 510));

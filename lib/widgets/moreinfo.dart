@@ -1,5 +1,6 @@
 import 'package:covid_19/widgets/counter.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class MoreInfo extends StatefulWidget {
   const MoreInfo({Key key, this.worldData}) : super(key: key);
@@ -19,19 +20,19 @@ class _MoreInfoState extends State<MoreInfo> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Counter(
-                  number: widget.worldData['critical'],
+                  number: widget.worldData['cases'],
                   color: Colors.purpleAccent,
-                  title: "Critical"),
+                  title: "Cases"),
               Counter(
-                  number: widget.worldData['todayDeaths'],
+                  number: widget.worldData['deaths'],
                   color: Theme.of(context).brightness == Brightness.light
                       ? Colors.black
                       : Colors.white,
-                  title: "Today Deaths"),
+                  title: "Deaths"),
               Counter(
-                  number: widget.worldData['active'],
+                  number: widget.worldData['recovered'],
                   color: Colors.brown,
-                  title: "Active"),
+                  title: "Recovered"),
             ],
           ),
           SizedBox(
@@ -41,13 +42,17 @@ class _MoreInfoState extends State<MoreInfo> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
               Counter(
-                  number: widget.worldData['tests'],
+                  number: widget.worldData['critical'],
                   color: Colors.deepOrange,
-                  title: "Tests"),
+                  title: "Critical"),
               Counter(
-                  number: widget.worldData['population'],
+                  number:NumberFormat.compact().format(widget.worldData['active']),
+                  color: Colors.deepOrange,
+                  title: "Active"),
+              Counter(
+                  number: NumberFormat.compact().format(widget.worldData['tests']),
                   color: Colors.indigoAccent,
-                  title: "population"),
+                  title: "Tests"),
             ],
           )
         ],

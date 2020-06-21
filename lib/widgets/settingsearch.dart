@@ -37,8 +37,10 @@ class SettingSearch extends SearchDelegate {
     final suggestionList = query.isEmpty
         ? countryList
         : countryList
-            .where((element) =>
-                element['country'].toString().toLowerCase().contains(query))
+            .where((element) => element['country']
+                .toString()
+                .toLowerCase()
+                .contains(query.toLowerCase()))
             .toList();
     return ListView.builder(
         itemCount: suggestionList.length,
@@ -77,7 +79,7 @@ class SettingSearch extends SearchDelegate {
             ),
             title: Text(suggestionList[index]['country'].toString()),
             onTap: () async {
-              getselected(suggestionList[index]['country'].toString(), prefs);
+              getselected(suggestionList[index]['country'], prefs);
               print("Notification Update...");
               Navigator.pop(context);
             },
@@ -126,7 +128,7 @@ class SettingSearch extends SearchDelegate {
             ),
             title: Text(suggestionList[index]['country'].toString()),
             onTap: () async {
-              getselected(suggestionList[index]['country'].toString(), prefs);
+              getselected(suggestionList[index]['country'], prefs);
               print("Notification Update...");
               Navigator.pop(context);
             },

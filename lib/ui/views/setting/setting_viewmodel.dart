@@ -75,10 +75,13 @@ class SettingViewModel extends BaseViewModel {
   }
 
   deleteNotificationCountry(String country, SharedPreferences prefs) async {
-    List<String> a = prefs.getStringList('notificationcountry');
-    a.removeWhere((element) => element == country);
-    await prefs.setStringList('notificationcountry', a);
-    List<String> b = [country];
+    List<String> notificationCountry =
+        prefs.getStringList('notificationcountry');
+    List<String> prevCases = prefs.getStringList('prevcases');
+    notificationCountry.removeWhere((element) => element == country);
+    prevCases.removeWhere((element) => element.contains(country));
+    await prefs.setStringList('notificationcountry', notificationCountry);
+    await prefs.setStringList('prevcases', prevCases);
     notifyListeners();
   }
 
@@ -97,11 +100,18 @@ class SettingViewModel extends BaseViewModel {
   void getselected(String country, SharedPreferences prefs) {
     if (prefs.getStringList('notificationcountry') == null) {
       prefs.setStringList('notificationcountry', [country]);
+      prefs.setStringList('prevcases', ["$country-0"]);
     } else {
-      List<String> a = prefs.getStringList('notificationcountry');
-      int i = a.indexWhere((element) => element == country);
-      if (i < 0) a.insert(0, country);
-      prefs.setStringList('notificationcountry', a);
+      List<String> notificationCountry =
+          prefs.getStringList('notificationcountry');
+      List<String> prevCases = prefs.getStringList('prevcases');
+      int i = notificationCountry.indexWhere((element) => element == country);
+      if (i < 0) {
+        notificationCountry.insert(0, country);
+        prevCases.insert(0, "$country-0");
+      }
+      prefs.setStringList('notificationcountry', notificationCountry);
+      prefs.setStringList('prevcases', prevCases);
     }
     notifyListeners();
   }

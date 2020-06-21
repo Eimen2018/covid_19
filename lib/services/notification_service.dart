@@ -72,18 +72,17 @@ class NotificationService {
         payload: "country");
   }
 
-  showNotification(List<String> cases) async {
+  showNotification(int id,List<String> cases) async {
     var androidPlatformChannelSpecifics = AndroidNotificationDetails('Case_0',
         'Countries Watching', 'Getting Data\'s of the countries you selected',
         importance: Importance.Max, priority: Priority.High, ticker: 'ticker');
     var iOSPlatformChannelSpecifics = IOSNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-    print(cases.length);
     if (cases.length > 0) {
       await flutterLocalNotificationsPlugin.show(
-          0,
-          "${cases[0]} Today Reported ",
+          id,
+          "${cases[0]} Now Reported ",
           "${cases[1]} cases ${cases[2]} deaths ${cases[3]} recovered",
           platformChannelSpecifics,
           payload: "country");

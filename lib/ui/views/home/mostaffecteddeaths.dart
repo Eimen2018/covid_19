@@ -45,7 +45,7 @@ class MostAffectedDeaths extends HookViewModelWidget<HomeViewModel> {
                 ]
               : [
                   MostAffected(
-                    type: "Highest Fatality By\nCountry",
+                    type: "Highest Mortality By\nCountry",
                     name: "Deaths",
                     color: Colors.red,
                     countryData: model.mostAffected,

@@ -36,7 +36,6 @@ class _InfoViewState extends State<InfoView> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<InfoViewModel>.reactive(
@@ -67,10 +66,10 @@ class _InfoViewState extends State<InfoView> {
                                 : kTitleTextstyle,
                           ),
                           SizedBox(height: 20),
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
+                          Container(
+                            width: MediaQuery.of(context).size.width,
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: <Widget>[
                                 SymptomCard(
                                   image: "assets/images/headache.png",
@@ -79,7 +78,7 @@ class _InfoViewState extends State<InfoView> {
                                 ),
                                 SymptomCard(
                                   image: "assets/images/caugh.png",
-                                  title: "Caugh",
+                                  title: "Cough",
                                 ),
                                 SymptomCard(
                                   image: "assets/images/fever.png",
