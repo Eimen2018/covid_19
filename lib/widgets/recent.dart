@@ -1,8 +1,6 @@
 import 'package:covid_19/constant.dart';
-import 'package:covid_19/ui/views/home/home_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:stacked_hooks/stacked_hooks.dart';
 
 class Recent extends StatefulWidget {
   final SharedPreferences prefs;

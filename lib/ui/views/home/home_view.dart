@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:connectivity/connectivity.dart';
 import 'package:covid_19/app/locator.dart';
-import 'package:covid_19/background.dart';
 import 'package:covid_19/enums/connectivity_status.dart';
 import 'package:covid_19/services/notification_service.dart';
 import 'package:covid_19/ui/views/home/home_viewmodel.dart';
@@ -243,7 +242,7 @@ class _HomeViewState extends State<HomeView> {
                                   onTap: () async {
                                     model.showHide();
                                   },
-                                  child: model.height == 110
+                                  child: model.height == 130
                                       ? Text(
                                           "See details",
                                           style: TextStyle(

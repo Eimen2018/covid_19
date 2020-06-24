@@ -4,7 +4,6 @@ import 'package:covid_19/app/locator.dart';
 import 'package:covid_19/app/router.gr.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:http/http.dart' as http;
@@ -16,7 +15,7 @@ class HomeViewModel extends BaseViewModel {
   String _country = 'Global';
   String get country => _country;
 
-  double _height = 110;
+  double _height = 130;
   double get height => _height;
 
   bool _moreInfo = false;
@@ -24,6 +23,8 @@ class HomeViewModel extends BaseViewModel {
 
   Map _worldData;
   Map get worldData => _worldData;
+  Map _worldDataYesterday;
+  Map get worldDataYesterday => _worldDataYesterday;
 
   List _mostAffected;
   List get mostAffected => _mostAffected;
@@ -56,6 +57,8 @@ class HomeViewModel extends BaseViewModel {
   int get pageIndicator => _pageIndicator;
   int _pageIndicator2 = 0;
   int get pageIndicator2 => _pageIndicator2;
+  int _pageIndicator3 = 0;
+  int get pageIndicator3 => _pageIndicator3;
   List<String> _notificatioinCases;
   List<String> get notificationCases => _notificatioinCases;
   int trial = 0;
@@ -64,15 +67,16 @@ class HomeViewModel extends BaseViewModel {
   changePageindicator(int current, int slider) {
     if (slider == 1) _pageIndicator = current;
     if (slider == 2) _pageIndicator2 = current;
+    if (slider == 3) _pageIndicator3 = current;
     notifyListeners();
   }
 
   void showHide() async {
-    if (_height == 310) {
-      _height = 110;
+    if (_height == 340) {
+      _height = 130;
       _moreInfo = false;
-    } else if (_height == 110) {
-      _height = 310;
+    } else if (_height == 130) {
+      _height = 340;
       notifyListeners();
       await new Future.delayed(const Duration(milliseconds: 510));
       _moreInfo = true;
@@ -83,6 +87,7 @@ class HomeViewModel extends BaseViewModel {
   void setcountry(String country) {
     _country = country;
     _worldData = null;
+    _worldDataYesterday = null;
     _linebar = null;
     _allhistoricalData = null;
     notifyListeners();
@@ -100,6 +105,9 @@ class HomeViewModel extends BaseViewModel {
       http.Response response =
           await http.get('http://corona.lmao.ninja/v2/all');
       _worldData = json.decode(response.body);
+      response =
+          await http.get('http://corona.lmao.ninja/v2/all?yesterday=true');
+      _worldDataYesterday = json.decode(response.body);
       _timeStamp = worldData['updated'];
       endOfTrial['WorldData'] = null;
     } catch (e) {
@@ -125,6 +133,9 @@ class HomeViewModel extends BaseViewModel {
       http.Response response =
           await http.get('https://disease.sh/v2/countries/' + country);
       _worldData = json.decode(response.body);
+      response =
+          await http.get('http://corona.lmao.ninja/v2/countries/'+country+'?yesterday=true');
+      _worldDataYesterday = json.decode(response.body);
       _timeStamp = worldData['updated'];
       endOfTrial['CountryData'] = null;
     } catch (e) {

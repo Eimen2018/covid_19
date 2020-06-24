@@ -28,7 +28,6 @@ void backgroundFetchHeadlessTask(String taskId) async {
     if (!checkSharedpreference(prefs)) {
       Map<String, List<String>> notification =
           await getnotificationStrings(prefs);
-      print(notification);
       if (notification.length > 0) {
         int id = 0;
         notification.forEach((key, value) {
@@ -55,7 +54,7 @@ showNotification(int id, List<String> cases) async {
   if (cases.length > 0) {
     await flutterLocalNotificationsPlugin.show(
         id,
-        "${cases[0]} Today Reported ",
+        "${cases[0]} Reported Now",
         "${cases[1]} cases ${cases[2]} deaths ${cases[3]} recovered",
         platformChannelSpecifics,
         payload: "country");
