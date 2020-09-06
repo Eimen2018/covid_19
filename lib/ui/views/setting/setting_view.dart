@@ -58,12 +58,6 @@ class _SettingViewState extends State<SettingView> {
         model.fetchAllcountries();
         if (prefs.getBool("isSwitched") != null)
           model.isSwitched = prefs.getBool("isSwitched");
-        // if (model.isSwitched && streamSubscription == null) {
-        //   streamSubscription = model.getCountrydata(prefs).listen((value) {
-        //     print('Value from controller: ' + value.toString());
-        //     // widget.notificationService.showNotification(value);
-        //   });
-        // }
       },
       viewModelBuilder: () => SettingViewModel(),
       builder: (context, model, child) => Scaffold(

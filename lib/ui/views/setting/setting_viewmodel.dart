@@ -34,20 +34,6 @@ class SettingViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  // String xxx = "";
-
-  // Stream<String> getCountrydata(SharedPreferences prefs) async* {
-  //   String b = "";
-  //   while (true) {
-  //     await Future.delayed(Duration(seconds: 4));
-  //     b = await getnotificationStrings(prefs);
-  //     if (xxx != b) {
-  //       xxx = await getnotificationStrings(prefs);
-  //       yield b;
-  //     }
-  //   }
-  // }
-
   List<Color> borderColors = [
     Colors.orangeAccent,
     Colors.redAccent,
@@ -118,40 +104,17 @@ class SettingViewModel extends BaseViewModel {
 
   Future searchPage(BuildContext context, SharedPreferences prefs,
       NotificationService notificationService) {
-    return showSearch(
-        context: context,
-        delegate: SettingSearch(
-            countryList: countryData,
-            prefs: prefs,
-            getselected: getselected,
-            notificationService: notificationService,
-            checkSharedpreference: checkSharedpreference));
+    return (countryData != null)
+        ? showSearch(
+            context: context,
+            delegate: SettingSearch(
+                countryList: countryData,
+                prefs: prefs,
+                getselected: getselected,
+                notificationService: notificationService,
+                checkSharedpreference: checkSharedpreference))
+        : null;
   }
-
-  // getnotificationStrings(SharedPreferences prefs) async {
-  //   List a;
-  //   String b = "";
-  //   if (checkSharedpreference(prefs)) {
-  //     return "Select A Country in Settings to Recieve Today Case Notification";
-  //   }
-  //   try {
-  //     http.Response response =
-  //         await http.get('https://disease.sh/v2/countries');
-  //     a = json.decode(response.body);
-  //     prefs.getStringList('notificationcountry').forEach((element) {
-  //       var c = a.firstWhere((e) => (e['country'].toString() == element));
-  //       if (c['todayCases'] == 0)
-  //         b += element + ": " + "Waiting Update" + " \n";
-  //       else
-  //         b += element + ": " + c['todayCases'].toString() + " \n";
-  //     });
-  //   } catch (e) {
-  //     print(e);
-  //     getnotificationStrings(prefs);
-  //   }
-
-  //   return b;
-  // }
 }
 
 class Item {
