@@ -1,5 +1,5 @@
 import 'package:covid_19/app/locator.dart';
-import 'package:covid_19/app/router.gr.dart';
+import 'package:covid_19/app/router.gr.dart' as Router;
 import 'package:covid_19/constant.dart';
 import 'package:covid_19/enums/connectivity_status.dart';
 import 'package:covid_19/services/connectivity_services.dart';
@@ -42,8 +42,8 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             title: 'Covid 19',
             theme: theme,
-            initialRoute: Routes.homeView,
-            onGenerateRoute: Router().onGenerateRoute,
+            initialRoute: Router.Routes.homeView,
+            onGenerateRoute: Router.Router().onGenerateRoute,
             navigatorKey: locator<NavigationService>().navigatorKey,
             // darkTheme: ThemeData(scaffoldBackgroundColor: Colors.black87),
           ),
