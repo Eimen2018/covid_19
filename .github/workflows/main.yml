@@ -4,7 +4,8 @@ on: push
 
 jobs:
   checkout_flutter:
-    name: Check flutter files
+    name: Run Flutter Test
+    id: unit_test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -12,12 +13,30 @@ jobs:
         with:
           java-version: "12.x"
 
-      - uses: subosito/flutter-action@v1
+      - uses: subosito/flutter-action@v1.4.0
         with:
           channel: "stable"
 
       - run: flutter pub get
 
+      - run: flutter format .
+
       - run: flutter format --set-exit-if-changed .
       
       - run: flutter test
+
+  comment:
+    needs: checkout_flutter
+    name: Comment Result
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v3
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '"${{ steps.unit_test.output }}"'
+            })
