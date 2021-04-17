@@ -41,5 +41,5 @@ jobs:
               body: 'Automated Unit Test Result: ${{ needs.checkout_flutter.steps.unit_test.outcome }}'
             })
       - name: Check on failures
-        if: ${{needs.checkout_flutter.steps.unit_test.outcome == "failure"}}
+        if: ${{needs.checkout_flutter.steps.unit_test.outcome == failure}}
         run: exit 1
