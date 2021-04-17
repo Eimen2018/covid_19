@@ -23,7 +23,6 @@ jobs:
       - name: Running Flutter Test
         id: unit_test
         run: flutter test --machine
-        continue-on-error: true
 
   comment:
     name: Comment Result
