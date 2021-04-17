@@ -21,10 +21,13 @@ jobs:
       - run: flutter format .
 
       - run: flutter format --set-exit-if-changed .
+      - name: Running Flutter Test
         id: unit_test
-      - run: flutter test
+        run: flutter test
+        continue-on-error: true
 
   comment:
+    needs: checkout_flutter
     name: Comment Result
     runs-on: ubuntu-latest
     steps:
@@ -33,7 +36,7 @@ jobs:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             github.issues.createComment({
-              issues _number: context.issues.number,
+              issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: 'Automated Unit Test Result: "${{ steps.unit_test.output }}"'
