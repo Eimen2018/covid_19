@@ -5,7 +5,6 @@ on: pull_request
 jobs:
   checkout_flutter:
     name: Run Flutter Test
-    id: unit_test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -22,7 +21,7 @@ jobs:
       - run: flutter format .
 
       - run: flutter format --set-exit-if-changed .
-      
+        id: unit_test
       - run: flutter test
 
   comment:
