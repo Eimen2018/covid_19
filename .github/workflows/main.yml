@@ -22,9 +22,8 @@ jobs:
 
       - name: Running Flutter Test
         id: unit_test
-        run: flutter test
+        run: flutter test --machine
         continue-on-error: true
-      - run: echo ${{ steps.checkout_flutter.outputs }}
 
   comment:
     name: Comment Result
