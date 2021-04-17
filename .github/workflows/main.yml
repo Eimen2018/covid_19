@@ -25,7 +25,6 @@ jobs:
       - run: flutter test
 
   comment:
-    needs: checkout_flutter
     name: Comment Result
     runs-on: ubuntu-latest
     steps:
