@@ -40,3 +40,6 @@ jobs:
               repo: context.repo.repo,
               body: 'Automated Unit Test Result: All tests Passed: ${{ needs.checkout_flutter.outputs["success"] }}'
             })
+      - name: Check on failures
+        if: needs.checkout_flutter.outputs.outputs["success"] == false
+        run: exit 1
