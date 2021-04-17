@@ -5,16 +5,16 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:covid_19/ui/views/home/home_viewmodel.dart';
-import 'package:flutter/material.dart';
+import 'package:covid_19/util/string_formatter.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:covid_19/main.dart';
-
 void main() {
-  test('check Api Works', () async {
-    final model = HomeViewModel();
-    await model.fetchAllcountries();
-    expect(model.countryData.isNotEmpty, true);
-  }, skip: 'Needs More Thought');
+  test(
+    'check Api Works',
+    () async {
+      final page = Stringish();
+      page.stringFormater("a");
+      expect(page.h, "a");
+    },
+  );
 }
