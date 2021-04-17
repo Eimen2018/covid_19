@@ -36,7 +36,6 @@ class _InfoViewState extends State<InfoView> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<InfoViewModel>.reactive(

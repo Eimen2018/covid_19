@@ -12,7 +12,8 @@ class PreventCard extends StatelessWidget {
     this.image,
     this.title,
     this.text,
-    this.imagewidth, this.position,
+    this.imagewidth,
+    this.position,
   }) : super(key: key);
 
   @override
@@ -42,7 +43,7 @@ class PreventCard extends StatelessWidget {
               ),
             ),
             Positioned(
-              left: position??0,
+              left: position ?? 0,
               child: Image.asset(
                 image,
                 width: imagewidth ?? 190,

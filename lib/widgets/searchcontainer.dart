@@ -8,8 +8,6 @@ class SearchContainer extends StatefulWidget {
 class _SearchContainerState extends State<SearchContainer> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      
-    );
+    return Container();
   }
 }

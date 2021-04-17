@@ -228,53 +228,52 @@ class _SettingViewState extends State<SettingView> {
                                                       "/4"),
                                                   SizedBox(width: 5),
                                                   InkWell(
-                                                    onTap:
-                                                        (model.checkcountryDataandLength(
+                                                    onTap: (model
+                                                                .checkcountryDataandLength(
                                                                     prefs) ||
-                                                                !model
-                                                                    .isSwitched)
-                                                            ? null
-                                                            : () async{
-                                                                String length =
-                                                                    model.getPrefLength(
-                                                                        prefs);
-                                                                await model.searchPage(
-                                                                    context,
-                                                                    prefs,
-                                                                    widget
-                                                                        .notificationService);
-                                                                 Future.delayed(
+                                                            !model.isSwitched)
+                                                        ? null
+                                                        : () async {
+                                                            String length = model
+                                                                .getPrefLength(
+                                                                    prefs);
+                                                            await model.searchPage(
+                                                                context,
+                                                                prefs,
+                                                                widget
+                                                                    .notificationService);
+                                                            Future.delayed(
+                                                                Duration(
+                                                                    milliseconds:
+                                                                        600),
+                                                                () {
+                                                              FlutterStatusbarcolor
+                                                                  .setStatusBarWhiteForeground(
+                                                                      false);
+                                                            });
+                                                            if (length !=
+                                                                model.getPrefLength(
+                                                                    prefs)) {
+                                                              _scaffoldKey
+                                                                  .currentState
+                                                                  .showSnackBar(
+                                                                      SnackBar(
+                                                                content: Text(
+                                                                  "Country Added to Notification Set",
+                                                                  style: TextStyle(
+                                                                      color: Colors
+                                                                          .white),
+                                                                ),
+                                                                duration:
                                                                     Duration(
-                                                                        milliseconds:
-                                                                            600),
-                                                                    () {
-                                                                  FlutterStatusbarcolor
-                                                                      .setStatusBarWhiteForeground(
-                                                                          false);
-                                                                });
-                                                                if (length !=
-                                                                    model.getPrefLength(
-                                                                        prefs)) {
-                                                                  _scaffoldKey
-                                                                      .currentState
-                                                                      .showSnackBar(
-                                                                          SnackBar(
-                                                                    content:
-                                                                        Text(
-                                                                      "Country Added to Notification Set",
-                                                                      style: TextStyle(
-                                                                          color:
-                                                                              Colors.white),
-                                                                    ),
-                                                                    duration: Duration(
                                                                         seconds:
                                                                             2),
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .black87,
-                                                                  ));
-                                                                }
-                                                              },
+                                                                backgroundColor:
+                                                                    Colors
+                                                                        .black87,
+                                                              ));
+                                                            }
+                                                          },
                                                     child: Container(
                                                       width: 30,
                                                       height: 30,

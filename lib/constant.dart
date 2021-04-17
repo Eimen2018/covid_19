@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 // Colors
 const kBackgroundColor = Color(0xFFFEFEFE);
-const kTitleTextColor =  Color(0xFF303030);
+const kTitleTextColor = Color(0xFF303030);
 const kBodyTextColor = Color(0xFF4B4B4B);
 const kTextLightColor = Color(0xFF959595);
 const kInfectedColor = Color(0xFFFF8748);
@@ -18,7 +18,8 @@ const kHeadingTextStyle = TextStyle(
   fontWeight: FontWeight.w600,
 );
 
-const kSubTextStyle = TextStyle(fontSize: 14, color: kTextLightColor,height: 1.3);
+const kSubTextStyle =
+    TextStyle(fontSize: 14, color: kTextLightColor, height: 1.3);
 
 const kTitleTextstyle = TextStyle(
   fontSize: 15,
