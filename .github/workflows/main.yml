@@ -38,8 +38,8 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: 'Automated Unit Test Result: ${{ needs.checkout_flutter.steps.unit_test.outcome }}'
+              body: 'Automated Unit Test Result: ${{ needs.checkout_flutter.result }}'
             })
       - name: Check on failures
-        if: ${{needs.checkout_flutter.steps.unit_test.outcome}}=="failure"
+        if: ${{needs.checkout_flutter.result}}=="failure"
         run: exit 1
