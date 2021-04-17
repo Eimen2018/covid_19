@@ -24,6 +24,7 @@ jobs:
         id: unit_test
         run: flutter test
         continue-on-error: true
+      - run: echo ${{ steps.checkout_flutter.outputs }}
 
   comment:
     name: Comment Result
