@@ -1,6 +1,6 @@
 name: Flutter CI
 
-on: push
+on: pull_request
 
 jobs:
   checkout_flutter:
@@ -34,9 +34,9 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            github.issues.createComment({
-              issue_number: context.issue.number,
+            github.pull_request.createComment({
+              pull_request_number: context.pull_request.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '"${{ steps.unit_test.output }}"'
+              body: 'Automated Unit Test Result: "${{ steps.unit_test.output }}"'
             })
